@@ -1,14 +1,13 @@
-import { UUID } from "crypto";
 import { ITissueLayer } from "./ITissue";
 
 export interface IBody {
-  id: UUID;
+  id: string;
   bodyParts: IBodyPart[];
   addBodyPart(bodyPart: IBodyPart): void;
   removeBodyPart(bodyPart: IBodyPart): void;
   updateBodyPart(bodyPart: IBodyPart): void;
 
-  getBodyPartById(id: UUID): IBodyPart;
+  getBodyPartById(id: string): IBodyPart;
   getBodyPartByName(name: string): IBodyPart;
   getAllBodyParts(): IBodyPart[];
   getAllbodyPartsByType(type: string): IBodyPart[];

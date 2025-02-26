@@ -1,8 +1,7 @@
-import { UUID } from "crypto";
 import { ICreature } from "./ICreature";
 
 export interface IEvent {
-  id: UUID;
+  id: string;
   type: EventType;
   timestamp: Date;
   duration?: number;

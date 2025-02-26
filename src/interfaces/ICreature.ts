@@ -1,4 +1,3 @@
-import { UUID } from "crypto";
 import { IGenome } from "./IGenome";
 import { IBody } from "./IBody";
 import { IMemory } from "./IMemory";
@@ -12,7 +11,7 @@ import {
 } from "./ITrait_ISkill";
 
 export interface ICreature {
-  id: UUID;
+  id: string;
   name: string;
   birthdate: Date; //TODO: longterm Goal own in house Dateformat
   genome: IGenome;

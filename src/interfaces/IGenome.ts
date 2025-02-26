@@ -1,18 +1,16 @@
-import { UUID } from "crypto";
-
 export interface IGenome {
-  id: UUID;
+  id: string;
   chromosomes: IChromosome[];
 }
 
 export interface IChromosome {
-  id: UUID;
+  id: string;
   genes: IGene[];
 }
 
 export interface IGene {
   // TODO: Allele und so weiter
-  id: UUID;
+  id: string;
   name: string;
   value: any;
 }
