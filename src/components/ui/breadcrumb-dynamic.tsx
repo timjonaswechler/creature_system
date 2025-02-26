@@ -33,9 +33,12 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
     // Check if this is a creature ID path and replace with creature name if possible
     if (paths[index - 1] === "creature" && path.length > 8) {
       try {
-        const creature = getCreatureById(path);
-        if (creature) {
-          label = creature.name;
+        // Nur auf der Client-Seite versuchen, die Kreatur zu laden
+        if (typeof window !== 'undefined') {
+          const creature = getCreatureById(path);
+          if (creature) {
+            label = creature.name;
+          }
         }
       } catch (error) {
         // If there's any error, just use the default label
@@ -53,7 +56,13 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
-  const breadcrumbs = generateBreadcrumbs(pathname);
+  // Zustandsvariable für die Breadcrumbs
+  const [breadcrumbs, setBreadcrumbs] = React.useState<BreadcrumbItem[]>([]);
+
+  // useEffect, um sicherzustellen, dass der Code nur auf der Client-Seite ausgeführt wird
+  React.useEffect(() => {
+    setBreadcrumbs(generateBreadcrumbs(pathname));
+  }, [pathname]);
 
   if (breadcrumbs.length <= 0) return null;
 
