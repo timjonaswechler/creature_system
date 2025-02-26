@@ -61,8 +61,6 @@ export default function CreatureDetailPage() {
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Zurück zur Übersicht
         </Button>
-        
-        <h1 className="text-3xl font-bold">{creature.name}</h1>
         <p className="text-muted-foreground">
           ID: {creature.id}
         </p>

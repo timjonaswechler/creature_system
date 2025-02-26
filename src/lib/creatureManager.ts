@@ -57,14 +57,14 @@ export const createNewCreature = (name: string): ICreature => {
       getBodyPartById: () => ({
         id: "",
         name: "",
-        type: "",
+        type: "HEAD",
         tissueLayer: [],
         connections: { childConnections: [] },
       }),
       getBodyPartByName: () => ({
         id: "",
         name: "",
-        type: "",
+        type: "HEAD",
         tissueLayer: [],
         connections: { childConnections: [] },
       }),
