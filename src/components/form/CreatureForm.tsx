@@ -1,4 +1,4 @@
-// src/components/CreatureForm.tsx
+// src/components/form/CreatureForm.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -9,8 +9,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useRouter } from 'next/navigation';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export function CreatureForm() {
+  const router = useRouter();
   const [creatures, setCreatures] = useState<Record<string, ICreature>>({});
   const [creatureName, setCreatureName] = useState('');
 
@@ -37,6 +47,10 @@ export function CreatureForm() {
     
     // Formular zurücksetzen
     setCreatureName('');
+  };
+
+  const handleViewCreature = (id: string) => {
+    router.push(`/creature/${id}`);
   };
 
   return (
@@ -68,25 +82,40 @@ export function CreatureForm() {
           <CardTitle>Deine Kreaturen</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {Object.keys(creatures).length === 0 ? (
-              <p className="text-muted-foreground">Noch keine Kreaturen erstellt.</p>
-            ) : (
-              <ul className="space-y-3">
+          {Object.keys(creatures).length === 0 ? (
+            <p className="text-muted-foreground">Noch keine Kreaturen erstellt.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Geburtsdatum</TableHead>
+                  <TableHead>Eigenschaften</TableHead>
+                  <TableHead>Aktionen</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {Object.values(creatures).map((creature) => (
-                  <li key={creature.id} className="flex items-center justify-between p-3 border rounded-md">
-                    <div>
-                      <p className="font-medium">{creature.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Geboren: {new Date(creature.birthdate).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Badge>{creature.traits.length} Eigenschaften</Badge>
-                  </li>
+                  <TableRow key={creature.id} className="cursor-pointer hover:bg-muted">
+                    <TableCell>{creature.name}</TableCell>
+                    <TableCell>{new Date(creature.birthdate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Badge>{creature.traits.length} Eigenschaften</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleViewCreature(creature.id)}
+                      >
+                        Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </ul>
-            )}
-          </div>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

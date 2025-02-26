@@ -5,9 +5,10 @@ import { CreatureForm } from "@/components/form/CreatureForm";
 export default function CreaturePage() {
   return (
     <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Creature Management</h1>
+      <h1 className="text-2xl font-bold mb-4">Kreaturenverwaltung</h1>
       <p className="mb-6">
         Erstelle und verwalte deine Kreaturen. Alle erstellten Kreaturen werden lokal im Browser gespeichert.
+        Klicke auf "Details", um mehr Informationen zu einer Kreatur anzuzeigen.
       </p>
       
       <CreatureForm />

@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { getCreatureById } from "@/lib/creatureManager";
 
 interface BreadcrumbItem {
   label: string;
@@ -18,15 +19,29 @@ interface BreadcrumbItem {
   isCurrent?: boolean;
 }
 
+// This function will generate breadcrumbs with custom labels when applicable
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   const paths = pathname.split("/").filter(Boolean);
-
+  
   return paths.map((path, index) => {
     const href = "/" + paths.slice(0, index + 1).join("/");
-    const label = path
+    let label = path
       .split("-")
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+    
+    // Check if this is a creature ID path and replace with creature name if possible
+    if (paths[index - 1] === "creature" && path.length > 8) {
+      try {
+        const creature = getCreatureById(path);
+        if (creature) {
+          label = creature.name;
+        }
+      } catch (error) {
+        // If there's any error, just use the default label
+        console.error("Error fetching creature for breadcrumb:", error);
+      }
+    }
 
     return {
       label,
