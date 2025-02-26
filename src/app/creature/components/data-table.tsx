@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -27,6 +28,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
+import { ICreature } from "@/interfaces/ICreature"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -37,6 +39,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter()
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -67,6 +70,10 @@ export function DataTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
+  // Function to handle row click
+  const handleRowClick = (id: string) => {
+    router.push(`/creature/${id}`)
+  }
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />
@@ -96,9 +103,23 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    // Use type assertion to access 'id' property
+                    const creature = row.original as ICreature
+                    handleRowClick(creature.id)
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell 
+                      key={cell.id}
+                      onClick={(e) => {
+                        // Stop propagation if it's a checkbox or action cell
+                        if (cell.column.id === "select" || cell.column.id === "actions") {
+                          e.stopPropagation()
+                        }
+                      }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

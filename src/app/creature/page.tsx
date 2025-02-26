@@ -1,20 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getCreatures, createNewCreature, saveCreature } from "@/lib/creatureManager"
+import { getCreatures } from "@/lib/creatureManager"
 import { ICreature } from "@/interfaces/ICreature"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { columns } from "./components/columns"
 import { DataTable } from "./components/data-table" 
+import { CreatureModal } from "@/components/form/CreatureModal"
 
-export function CreatureDataTable() {
+export default function CreaturePage() {
   const [creatures, setCreatures] = useState<ICreature[]>([])
-  const [creatureName, setCreatureName] = useState("")
 
-  // Lade Kreaturen beim Mounten der Komponente
+  // Load creatures when component mounts
   useEffect(() => {
     loadCreatures()
   }, [])
@@ -24,56 +21,29 @@ export function CreatureDataTable() {
     setCreatures(Object.values(storedCreatures))
   }
 
-  const handleCreateCreature = () => {
-    if (!creatureName.trim()) return
-
-    // Neue Kreatur erstellen
-    const newCreature = createNewCreature(creatureName)
-    
-    // Kreatur speichern
-    saveCreature(newCreature)
-    
-    // Lade Kreaturen neu, um sicherzustellen, dass die Tabelle aktuell ist
-    loadCreatures()
-    
-    // Formular zurücksetzen
-    setCreatureName("")
-  }
-
   return (
     <div className="space-y-6">
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Neue Kreatur erstellen</CardTitle>
-          <CardDescription>
-            Erstelle eine neue Kreatur in deiner Sammlung
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 items-end">
-            <div className="space-y-2 flex-1">
-              <Label htmlFor="name">Name der Kreatur</Label>
-              <Input
-                id="name"
-                value={creatureName}
-                onChange={(e) => setCreatureName(e.target.value)}
-                placeholder="Name eingeben..."
-              />
-            </div>
-            <Button onClick={handleCreateCreature}>Kreatur erstellen</Button>
-          </div>
-        </CardContent>
-      </Card> */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Creatures</h2>
+          <p className="text-muted-foreground">
+            Manage your creature collection
+          </p>
+        </div>
+        <CreatureModal onCreatureCreated={loadCreatures} />
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Deine Kreaturen</CardTitle>
+          <CardTitle>Your Creatures</CardTitle>
           <CardDescription>
-            Alle deine erstellten Kreaturen
+            View and manage all your created creatures
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={creatures} />
+          
+            <DataTable columns={columns} data={creatures} />
+          
         </CardContent>
       </Card>
     </div>

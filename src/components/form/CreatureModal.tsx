@@ -51,8 +51,8 @@ export function CreatureModal({ onCreatureCreated }: CreatureModalProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      race: "",
-      name: ""
+      race: "human",
+      name: "a"
     }
   });
 
