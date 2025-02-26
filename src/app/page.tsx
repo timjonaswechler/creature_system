@@ -1,8 +1,10 @@
-import Page from "@/components/blocks/mail/page";
-import Image from "next/image";
-
 export default function Home() {
   return (
-    Page()
+    <div className="container mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Willkommen zum Creature System</h1>
+      <p>
+        Wähle eine Option aus dem Sidebar-Menü, um zu beginnen.
+      </p>
+    </div>
   );
 }

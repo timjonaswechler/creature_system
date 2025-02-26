@@ -1,12 +1,12 @@
 import React from "react";
 
-const CreaturePage: React.FC = () => {
-    return (
-        <div>
-            <h1>Creature System</h1>
-            <p>Welcome to the base page of the creature system.</p>
-        </div>
-    );
-};
-
-export default CreaturePage;
+export default function CreaturePage() {
+  return (
+    <div className="container mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Creature System</h1>
+      <p>
+        Willkommen zur Creature System Seite. Hier kannst du alle verfügbaren Creature-Funktionen nutzen.
+      </p>
+    </div>
+  );
+}
