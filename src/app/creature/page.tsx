@@ -1,25 +1,31 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { getCreatures } from "@/lib/creatureManager"
-import { ICreature } from "@/interfaces/ICreature"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { columns } from "./components/columns"
-import { DataTable } from "./components/data-table" 
-import { CreatureModal } from "@/components/form/CreatureModal"
+import { useState, useEffect } from "react";
+import { getCreatures } from "@/lib/creatureManager";
+import { ICreature } from "@/interfaces/ICreature";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { columns } from "./components/columns";
+import { DataTable } from "./components/data-table";
+import { CreatureModal } from "@/components/form/CreatureModal";
 
 export default function CreaturePage() {
-  const [creatures, setCreatures] = useState<ICreature[]>([])
+  const [creatures, setCreatures] = useState<ICreature[]>([]);
 
   // Load creatures when component mounts
   useEffect(() => {
-    loadCreatures()
-  }, [])
+    loadCreatures();
+  }, []);
 
   const loadCreatures = () => {
-    const storedCreatures = getCreatures()
-    setCreatures(Object.values(storedCreatures))
-  }
+    const storedCreatures = getCreatures();
+    setCreatures(Object.values(storedCreatures));
+  };
 
   return (
     <div className="space-y-6">
@@ -33,19 +39,11 @@ export default function CreaturePage() {
         <CreatureModal onCreatureCreated={loadCreatures} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Creatures</CardTitle>
-          <CardDescription>
-            View and manage all your created creatures
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          
-            <DataTable columns={columns} data={creatures} />
-          
-        </CardContent>
-      </Card>
+      <DataTable
+        columns={columns}
+        data={creatures}
+        onCreatureCreated={loadCreatures}
+      />
     </div>
-  )
+  );
 }

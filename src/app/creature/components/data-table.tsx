@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
+import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,7 +15,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -24,29 +24,36 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
-import { ICreature } from "@/interfaces/ICreature"
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { ICreature } from "@/interfaces/ICreature";
+import { CreatureModal } from "@/components/form/CreatureModal";
+import { useState } from "react";
+import { PlusCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  onCreatureCreated?: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onCreatureCreated,
 }: DataTableProps<TData, TValue>) {
-  const router = useRouter()
-  const [rowSelection, setRowSelection] = React.useState({})
+  const router = useRouter();
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const table = useReactTable({
     data,
@@ -68,12 +75,20 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   // Function to handle row click
   const handleRowClick = (id: string) => {
-    router.push(`/creature/${id}`)
-  }
+    router.push(`/creature/${id}`);
+  };
+
+  const handleCreatureCreated = () => {
+    setIsModalOpen(false);
+    if (onCreatureCreated) {
+      onCreatureCreated();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />
@@ -92,7 +107,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -106,17 +121,20 @@ export function DataTable<TData, TValue>({
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     // Use type assertion to access 'id' property
-                    const creature = row.original as ICreature
-                    handleRowClick(creature.id)
+                    const creature = row.original as ICreature;
+                    handleRowClick(creature.id);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell 
+                    <TableCell
                       key={cell.id}
                       onClick={(e) => {
                         // Stop propagation if it's a checkbox or action cell
-                        if (cell.column.id === "select" || cell.column.id === "actions") {
-                          e.stopPropagation()
+                        if (
+                          cell.column.id === "select" ||
+                          cell.column.id === "actions"
+                        ) {
+                          e.stopPropagation();
                         }
                       }}
                     >
@@ -132,9 +150,18 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center cursor-pointer"
+                  onClick={() => setIsModalOpen(true)}
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center p-8 text-center hover:bg-muted/30 rounded-md transition-colors">
+                    <p className="text-lg font-medium">No creatures found</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Click here to create your first creature
+                    </p>
+                    <Button variant="outline" className="mt-4">
+                      Create Creature
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -143,5 +170,5 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination table={table} />
     </div>
-  )
+  );
 }
