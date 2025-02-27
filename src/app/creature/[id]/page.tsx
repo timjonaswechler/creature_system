@@ -23,12 +23,58 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TraitEditor } from "@/components/form/TraitEditor";
+import { SkillEditor } from "@/components/form/SkillEditor";
+import { ISkill } from "@/interfaces/ISkill";
+
+function getSkillDisplayName(skill: ISkill): string {
+  const levelNames = [
+    "Not",
+    "Dabbling",
+    "Novice",
+    "Adequate",
+    "Competent",
+    "Skilled",
+    "Proficient",
+    "Talented",
+    "Adept",
+    "Expert",
+    "Professional",
+    "Accomplished",
+    "Great",
+    "Master",
+    "High Master",
+    "Grand Master",
+    "Legendary",
+  ];
+
+  const baseName = levelNames[skill.level] || "Legendary";
+
+  if (skill.level > 15) {
+    const plusCount = skill.level - 15;
+    return `${baseName}${"+".repeat(plusCount)}`;
+  }
+
+  return baseName;
+}
 
 export default function CreatureDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [creature, setCreature] = useState<ICreature | null>(null);
   const [loading, setLoading] = useState(true);
+  // Füge einen useState für die Aktualisierung hinzu
+  const [refreshData, setRefreshData] = useState(false);
+
+  // Füge eine Funktion für die Aktualisierung hinzu
+  const refreshCreatureData = () => {
+    if (params.id) {
+      const id = Array.isArray(params.id) ? params.id[0] : params.id;
+      const foundCreature = getCreatureById(id);
+      setCreature(foundCreature);
+      setRefreshData((prev) => !prev);
+    }
+  };
 
   useEffect(() => {
     if (params.id) {
@@ -94,25 +140,40 @@ export default function CreatureDetailPage() {
                   <TableCell className="font-medium">
                     Mentaler Zustand
                   </TableCell>
-                  <TableCell>{creature.mentalState.name}</TableCell>
+                  <TableCell>
+                    {creature.mentalStates.length > 0
+                      ? creature.mentalStates[0].name
+                      : "Normal"}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">
                     Sozialer Zustand
                   </TableCell>
-                  <TableCell>{creature.socialState.name}</TableCell>
+                  <TableCell>
+                    {creature.socialRelations.length > 0
+                      ? `${creature.socialRelations.length} Beziehungen`
+                      : "Keine Beziehungen"}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle>Eigenschaften</CardTitle>
-            <CardDescription>
-              Persönliche Eigenschaften dieser Kreatur
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Eigenschaften</CardTitle>
+              <CardDescription>
+                Persönliche Eigenschaften dieser Kreatur
+              </CardDescription>
+            </div>
+            {creature && (
+              <TraitEditor
+                creature={creature}
+                onTraitAdded={refreshCreatureData}
+              />
+            )}
           </CardHeader>
           <CardContent>
             {creature.traits.length === 0 ? (
@@ -120,19 +181,104 @@ export default function CreatureDetailPage() {
                 Keine Eigenschaften definiert.
               </p>
             ) : (
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
                 {creature.traits.map((trait) => (
-                  <Badge key={trait.id}>{trait.name}</Badge>
+                  <div key={trait.id} className="p-3 border rounded-md">
+                    <div className="flex justify-between items-center">
+                      <div className="font-medium">{trait.name}</div>
+                      <Badge
+                        variant={
+                          trait.impact === "POSITIVE"
+                            ? "default"
+                            : trait.impact === "NEGATIVE"
+                            ? "destructive"
+                            : trait.impact === "NEUTRAL"
+                            ? "secondary"
+                            : "outline"
+                        }
+                      >
+                        {trait.impact}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {trait.description}
+                    </p>
+                    <div className="text-xs text-muted-foreground mt-2">
+                      Kategorie: {trait.category}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle>Fähigkeiten</CardTitle>
-            <CardDescription>Erlernte Fähigkeiten der Kreatur</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Eigenschaften</CardTitle>
+              <CardDescription>
+                Persönliche Eigenschaften dieser Kreatur
+              </CardDescription>
+            </div>
+            {creature && (
+              <TraitEditor
+                creature={creature}
+                onTraitAdded={refreshCreatureData}
+              />
+            )}
+          </CardHeader>
+          <CardContent>
+            {creature.traits.length === 0 ? (
+              <p className="text-muted-foreground">
+                Keine Eigenschaften definiert.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {creature.traits.map((trait) => (
+                  <div key={trait.id} className="p-3 border rounded-md">
+                    <div className="flex justify-between items-center">
+                      <div className="font-medium">{trait.name}</div>
+                      <Badge
+                        variant={
+                          trait.impact === "POSITIVE"
+                            ? "default"
+                            : trait.impact === "NEGATIVE"
+                            ? "destructive"
+                            : trait.impact === "NEUTRAL"
+                            ? "secondary"
+                            : "outline"
+                        }
+                      >
+                        {trait.impact}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {trait.description}
+                    </p>
+                    <div className="text-xs text-muted-foreground mt-2">
+                      Kategorie: {trait.category}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        // Ändere die Skills-Karte
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Fähigkeiten</CardTitle>
+              <CardDescription>
+                Erlernte Fähigkeiten der Kreatur
+              </CardDescription>
+            </div>
+            {creature && (
+              <SkillEditor
+                creature={creature}
+                onSkillAdded={refreshCreatureData}
+              />
+            )}
           </CardHeader>
           <CardContent>
             {creature.skills.length === 0 ? (
@@ -145,13 +291,35 @@ export default function CreatureDetailPage() {
                   <TableRow>
                     <TableHead>Fähigkeit</TableHead>
                     <TableHead>Level</TableHead>
+                    <TableHead>Leidenschaft</TableHead>
+                    <TableHead>Kategorie</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {creature.skills.map((skill) => (
                     <TableRow key={skill.id}>
-                      <TableCell>{skill.name}</TableCell>
-                      <TableCell>{skill.level}</TableCell>
+                      <TableCell className="font-medium">
+                        {skill.name}
+                      </TableCell>
+                      <TableCell>
+                        {skill.level} ({skill.getDisplayName()})
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            skill.passion === "BURNING"
+                              ? "default"
+                              : skill.passion === "MAJOR"
+                              ? "secondary"
+                              : skill.passion === "MINOR"
+                              ? "outline"
+                              : "secondary"
+                          }
+                        >
+                          {skill.passion}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{skill.category}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -159,7 +327,6 @@ export default function CreatureDetailPage() {
             )}
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Ziele</CardTitle>
@@ -188,6 +355,95 @@ export default function CreatureDetailPage() {
                 </TableBody>
               </Table>
             )}
+          </CardContent>
+        </Card>
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>Attribute</CardTitle>
+            <CardDescription>
+              Physische, mentale und soziale Eigenschaften
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Physische Attribute */}
+              <div>
+                <h3 className="font-semibold mb-2">Physisch</h3>
+                <div className="space-y-2">
+                  {Object.entries(creature.physicalAttributes).map(
+                    ([key, attr]) => (
+                      <div
+                        key={key}
+                        className="flex justify-between items-center"
+                      >
+                        <span>{attr.name}</span>
+                        <div className="flex items-center">
+                          <div className="w-32 bg-secondary rounded-full h-2 mr-2">
+                            <div
+                              className="bg-primary h-2 rounded-full"
+                              style={{ width: `${attr.currentValue}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm">{attr.currentValue}</span>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Mentale Attribute */}
+              <div>
+                <h3 className="font-semibold mb-2">Mental</h3>
+                <div className="space-y-2">
+                  {Object.entries(creature.mentalAttributes).map(
+                    ([key, attr]) => (
+                      <div
+                        key={key}
+                        className="flex justify-between items-center"
+                      >
+                        <span>{attr.name}</span>
+                        <div className="flex items-center">
+                          <div className="w-32 bg-secondary rounded-full h-2 mr-2">
+                            <div
+                              className="bg-primary h-2 rounded-full"
+                              style={{ width: `${attr.currentValue}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm">{attr.currentValue}</span>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Soziale Attribute */}
+              <div>
+                <h3 className="font-semibold mb-2">Sozial</h3>
+                <div className="space-y-2">
+                  {Object.entries(creature.socialAttributes).map(
+                    ([key, attr]) => (
+                      <div
+                        key={key}
+                        className="flex justify-between items-center"
+                      >
+                        <span>{attr.name}</span>
+                        <div className="flex items-center">
+                          <div className="w-32 bg-secondary rounded-full h-2 mr-2">
+                            <div
+                              className="bg-primary h-2 rounded-full"
+                              style={{ width: `${attr.currentValue}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm">{attr.currentValue}</span>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

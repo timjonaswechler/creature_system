@@ -1,6 +1,10 @@
 // src/utils/creatureManager.ts
 import { v4 as uuidv4 } from "uuid"; // Du musst dieses Paket installieren: npm install uuid @types/uuid
 import { createBasicHumanoidBody } from "@/examples/bodyExamples";
+import { Trait } from "../models/Trait";
+import { Skill } from "../models/Skill";
+import { TraitCategory, TraitImpact } from "../interfaces/ITrait";
+import { SkillCategory, SkillPassion } from "../interfaces/ISkill";
 
 import {
   ICreature,
@@ -18,6 +22,7 @@ import {
   AttributeCategory,
 } from "../interfaces/IAttribute";
 import { Attribute } from "../models/Attribute";
+import { Creature } from "@/models/Creature";
 export const STORAGE_KEY = "creatures";
 
 /**
@@ -60,6 +65,17 @@ export const createNewCreature = (name: string): ICreature => {
   // Hier erstellst du eine neue Kreatur mit allen erforderlichen Eigenschaften
   // und setzt sinnvolle Standardwerte
   const body = createBasicHumanoidBody();
+  // Erstelle einige Standard-Traits
+  const traits = [
+    // Körperliche Eigenschaften
+    createToughTrait(),
+
+    // Basisstimmung wie in RimWorld
+    createSanguineTrait(),
+
+    // Arbeitseigenschaften
+    createHardWorkerTrait(),
+  ];
 
   // Erstelle Attribute mit der Attribute-Klasse
   const physicalAttributes: IPhysicalAttributes = {
@@ -185,61 +201,25 @@ export const createNewCreature = (name: string): ICreature => {
     }),
   };
 
-  // Leere Listen für Needs, Thoughts, etc. erstellen
-  const needs: INeed[] = [];
-  const thoughts: IThought[] = [];
-  const healthConditions: IHealthCondition[] = [];
-  const mentalStates: IMentalState[] = [];
-  const socialRelations: ISocialRelation[] = [];
-
-  const newCreature: ICreature = {
+  const newCreature = new Creature({
     id: uuidv4(),
     name: name,
     birthdate: new Date(),
     genome: { id: uuidv4(), chromosomes: [] },
     body: body,
     memory: { events: [] },
+  });
 
-    // Neue Attribute
-    physicalAttributes: physicalAttributes,
-    mentalAttributes: mentalAttributes,
-    socialAttributes: socialAttributes,
+  // Erstelle einige Basis-Skills
+  const skills = [
+    createCraftingSkill(newCreature),
+    createMiningSkill(newCreature),
+    createShootingSkill(newCreature),
+  ];
 
-    // Vorhandene Eigenschaften
-    goals: [],
-    skills: [],
-    traits: [],
-    mentalState: {
-      id: uuidv4(),
-      name: "Normal",
-      description: "Regular state of mind",
-      value: 0,
-    },
-    physicalState: [],
-    socialState: {
-      id: uuidv4(),
-      name: "Neutral",
-      description: "Normal social standing",
-      value: 0,
-    },
-
-    // Neue Eigenschaften
-    needs: needs,
-    mood: 50, // Standardwert für Stimmung
-    thoughts: thoughts,
-    healthConditions: healthConditions,
-    mentalStates: [],
-    socialRelations: socialRelations,
-
-    // Methoden
-    calculateMood: () => 50, // Platzhalter-Implementierung
-    updateNeeds: (ticksPassed: number) => {}, // Platzhalter-Implementierung
-    gainExperienceInSkill: (skillId: string, amount: number) => {}, // Platzhalter-Implementierung
-    applyHealthEffect: (effect: IHealthEffect) => {}, // Platzhalter-Implementierung
-    applyThought: (thought: IThought) => {}, // Platzhalter-Implementierung
-    getEffectiveSkillLevel: (skillId: string) => 0, // Platzhalter-Implementierung
-    getEffectiveAttributeValue: (attributeId: string) => 0, // Platzhalter-Implementierung
-  };
+  // Füge sie zur Kreatur hinzu
+  newCreature.traits = traits;
+  newCreature.skills = skills;
 
   return newCreature;
 };
@@ -261,3 +241,133 @@ export const deleteCreature = (id: string): void => {
 export const deleteAllCreatures = (): void => {
   localStorage.removeItem(STORAGE_KEY);
 };
+
+// Hilfsfunktionen für Trait-Erstellung
+function createToughTrait(): Trait {
+  const trait = new Trait();
+  trait.id = uuidv4();
+  trait.name = "Zäh";
+  trait.description =
+    "Diese Person hat eine dickere Haut, dichteres Fleisch und stabilere Knochen.";
+  trait.category = TraitCategory.PHYSICAL;
+  trait.impact = TraitImpact.POSITIVE;
+
+  trait.attributeModifiers = [
+    {
+      attributeId: "toughness",
+      modifier: 20,
+    },
+    {
+      attributeId: "recuperation",
+      modifier: 10,
+    },
+  ];
+
+  return trait;
+}
+
+function createSanguineTrait(): Trait {
+  const trait = new Trait();
+  trait.id = uuidv4();
+  trait.name = "Sanguinisch";
+  trait.description =
+    "Diese Person ist von Natur aus optimistisch und gut gelaunt.";
+  trait.category = TraitCategory.PERSONALITY;
+  trait.impact = TraitImpact.POSITIVE;
+
+  trait.moodModifiers = [
+    {
+      moodChange: 12, // Permanenter Stimmungsbonus
+    },
+  ];
+
+  return trait;
+}
+
+function createHardWorkerTrait(): Trait {
+  const trait = new Trait();
+  trait.id = uuidv4();
+  trait.name = "Fleißig";
+  trait.description =
+    "Ein natürlicher Arbeiter, der Aufgaben schneller als die meisten erledigt.";
+  trait.category = TraitCategory.SPECTRUM;
+  trait.impact = TraitImpact.POSITIVE;
+
+  trait.attributeModifiers = [
+    {
+      attributeId: "willpower",
+      modifier: 0, // Hinzufügen des erforderlichen Feldes mit Standardwert
+      modifierPercent: 20, // Prozentuale Steigerung für alle arbeitsbezogenen Aktivitäten
+    },
+  ];
+
+  return trait;
+}
+
+// Hilfsfunktionen für Skill-Erstellung
+function createCraftingSkill(creature: ICreature): Skill {
+  const skill = new Skill();
+  skill.id = uuidv4();
+  skill.name = "Handwerk";
+  skill.description =
+    "Die Fähigkeit, Gegenstände herzustellen und zu verarbeiten.";
+  skill.category = SkillCategory.CRAFTING;
+  skill.level = 4; // Skilled
+  skill.experience = 7000;
+  skill.passion = SkillPassion.MINOR;
+
+  // Attribute-Verknüpfungen hinzufügen
+  skill.primaryAttributes = [
+    creature.physicalAttributes.strength,
+    creature.mentalAttributes.creativity,
+  ];
+
+  skill.secondaryAttributes = [
+    creature.physicalAttributes.agility,
+    creature.mentalAttributes.patience,
+  ];
+
+  return skill;
+}
+
+function createMiningSkill(creature: ICreature): Skill {
+  const skill = new Skill();
+  skill.id = uuidv4();
+  skill.name = "Bergbau";
+  skill.description = "Die Fähigkeit, effizient Ressourcen abzubauen.";
+  skill.category = SkillCategory.LABOR;
+  skill.level = 2; // Adequate
+  skill.experience = 2000;
+  skill.passion = SkillPassion.NONE;
+
+  // Attribute-Verknüpfungen hinzufügen
+  skill.primaryAttributes = [
+    creature.physicalAttributes.strength,
+    creature.physicalAttributes.endurance,
+  ];
+
+  skill.secondaryAttributes = [creature.mentalAttributes.patience];
+
+  return skill;
+}
+
+function createShootingSkill(creature: ICreature): Skill {
+  const skill = new Skill();
+  skill.id = uuidv4();
+  skill.name = "Schießen";
+  skill.description = "Die Fähigkeit, präzise mit Fernkampfwaffen zu treffen.";
+  skill.category = SkillCategory.COMBAT;
+  skill.level = 3; // Competent
+  skill.experience = 4000;
+  skill.passion = SkillPassion.MAJOR;
+
+  // Attribute-Verknüpfungen hinzufügen
+  skill.primaryAttributes = [
+    creature.physicalAttributes.agility,
+    creature.mentalAttributes.focus,
+  ];
+
+  skill.secondaryAttributes = [creature.physicalAttributes.strength];
+
+  return skill;
+}

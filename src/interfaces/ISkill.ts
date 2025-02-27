@@ -36,7 +36,7 @@ export interface ISkill {
   checkForLevelUp(): boolean;
   applyRust(): void;
   getEffectiveLevel(): number; // Berücksichtigt Rost und temporäre Modifikationen
-
+  getDisplayName(): string; // Gibt den Namen des Skills mit Level zurück
   // Optional: Learning Rate Modifier (wie viel Erfahrung beim Ausführen gesammelt wird)
   learningRateModifier: number;
 }

@@ -8,6 +8,7 @@ import {
   IMentalState,
   ISocialRelation,
   IHealthEffect,
+  MentalStateSeverity,
 } from "../interfaces/ICreature";
 import { IGenome } from "../interfaces/IGenome";
 import { IBody, IBodyPart } from "../interfaces/IBody";
@@ -64,8 +65,20 @@ export class Creature implements ICreature {
     this.body = params.body;
     this.memory = params.memory;
 
-    // Initialisiere Attribute
-    this.initializeAttributes();
+    (this.mentalStates = [
+      {
+        id: uuidv4(),
+        name: "Normal",
+        description: "Regular state of mind",
+        severity: MentalStateSeverity.MINOR,
+        duration: -1,
+        remainingTime: -1,
+        behaviorModifiers: [],
+      },
+    ]),
+      (this.socialRelations = []),
+      // Initialisiere Attribute
+      this.initializeAttributes();
   }
 
   get age(): number {

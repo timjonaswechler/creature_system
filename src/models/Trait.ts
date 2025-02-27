@@ -14,7 +14,7 @@ import { IAttributeModifier } from "@/interfaces/IAttribute";
 import { ISkillModifier } from "@/interfaces/ISkill";
 
 // Beispielimplementierung für Traits und deren Auswirkungen
-class Trait implements ITrait {
+export class Trait implements ITrait {
   id: string;
   name: string;
   description: string;

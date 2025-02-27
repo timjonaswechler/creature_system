@@ -16,7 +16,6 @@ export interface ICreature {
   id: string;
   name: string;
   birthdate: Date;
-  age: number; // Berechnetes Alter
 
   // Grundeigenschaften
   genome: IGenome;

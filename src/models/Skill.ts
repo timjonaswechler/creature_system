@@ -9,7 +9,7 @@ import { IAttribute } from "../interfaces/IAttribute";
 import { v4 as uuidv4 } from "uuid";
 
 // Beispielimplementierung für Skill-XP-Gewinn und Verfall
-class Skill implements ISkill {
+export class Skill implements ISkill {
   id: string;
   name: string;
   description: string;
