@@ -3,7 +3,7 @@ export interface IGoal {
   name: string;
   description: string;
   priority: number;
-  deadline: Date;
+  deadline?: Date;
   status: GoalStatus;
   subgoals: IGoal[];
 }

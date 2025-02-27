@@ -148,7 +148,7 @@ export class Skill implements ISkill {
   }
 
   getDisplayName(): string {
-    const baseName = SKILL_LEVEL_NAMES[this.level] || "Legendary";
+    const baseName = SKILL_LEVEL_NAMES[this.level];
 
     // Rost anzeigen
     if (this.level > 0) {
@@ -162,8 +162,8 @@ export class Skill implements ISkill {
     }
 
     // Legendary+ für höhere Stufen
-    if (this.level > 15) {
-      const plusCount = this.level - 15;
+    if (this.level > 16) {
+      const plusCount = this.level - 16;
       return `${baseName}${"+".repeat(plusCount)}`;
     }
 

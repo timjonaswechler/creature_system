@@ -25,34 +25,27 @@ import {
 } from "@/components/ui/table";
 import { TraitEditor } from "@/components/form/TraitEditor";
 import { SkillEditor } from "@/components/form/SkillEditor";
-import { ISkill } from "@/interfaces/ISkill";
+import { ISkill, SKILL_LEVEL_NAMES } from "@/interfaces/ISkill";
 
+// Helper function to get skill display name since the method might not be preserved in localStorage
 function getSkillDisplayName(skill: ISkill): string {
-  const levelNames = [
-    "Not",
-    "Dabbling",
-    "Novice",
-    "Adequate",
-    "Competent",
-    "Skilled",
-    "Proficient",
-    "Talented",
-    "Adept",
-    "Expert",
-    "Professional",
-    "Accomplished",
-    "Great",
-    "Master",
-    "High Master",
-    "Grand Master",
-    "Legendary",
-  ];
+  const baseName = SKILL_LEVEL_NAMES[skill.level] || "Legendary";
 
-  const baseName = levelNames[skill.level] || "Legendary";
-
-  if (skill.level > 15) {
-    const plusCount = skill.level - 15;
+  // Check if it's a legendary+ skill
+  if (skill.level > 16) {
+    const plusCount = skill.level - 16;
     return `${baseName}${"+".repeat(plusCount)}`;
+  }
+
+  // Check for rust if level is greater than 0
+  if (skill.level > 0) {
+    const rustFactor = skill.rustCounter / 2;
+
+    if (skill.level >= 4 && rustFactor >= 3) {
+      return `${baseName} (V.Rusty)`;
+    } else if (rustFactor > 0) {
+      return `${baseName} (Rusty)`;
+    }
   }
 
   return baseName;
@@ -63,10 +56,10 @@ export default function CreatureDetailPage() {
   const router = useRouter();
   const [creature, setCreature] = useState<ICreature | null>(null);
   const [loading, setLoading] = useState(true);
-  // Füge einen useState für die Aktualisierung hinzu
+  // State for updating data
   const [refreshData, setRefreshData] = useState(false);
 
-  // Füge eine Funktion für die Aktualisierung hinzu
+  // Function to refresh creature data
   const refreshCreatureData = () => {
     if (params.id) {
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -88,7 +81,7 @@ export default function CreatureDetailPage() {
   if (loading) {
     return <div>Lade Kreatur...</div>;
   }
-  console.log(creature);
+
   if (!creature) {
     return (
       <div className="container mx-auto">
@@ -160,6 +153,7 @@ export default function CreatureDetailPage() {
             </Table>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -212,59 +206,8 @@ export default function CreatureDetailPage() {
             )}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Eigenschaften</CardTitle>
-              <CardDescription>
-                Persönliche Eigenschaften dieser Kreatur
-              </CardDescription>
-            </div>
-            {creature && (
-              <TraitEditor
-                creature={creature}
-                onTraitAdded={refreshCreatureData}
-              />
-            )}
-          </CardHeader>
-          <CardContent>
-            {creature.traits.length === 0 ? (
-              <p className="text-muted-foreground">
-                Keine Eigenschaften definiert.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {creature.traits.map((trait) => (
-                  <div key={trait.id} className="p-3 border rounded-md">
-                    <div className="flex justify-between items-center">
-                      <div className="font-medium">{trait.name}</div>
-                      <Badge
-                        variant={
-                          trait.impact === "POSITIVE"
-                            ? "default"
-                            : trait.impact === "NEGATIVE"
-                            ? "destructive"
-                            : trait.impact === "NEUTRAL"
-                            ? "secondary"
-                            : "outline"
-                        }
-                      >
-                        {trait.impact}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {trait.description}
-                    </p>
-                    <div className="text-xs text-muted-foreground mt-2">
-                      Kategorie: {trait.category}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        // Ändere die Skills-Karte
+
+        {/* Skills Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -302,7 +245,7 @@ export default function CreatureDetailPage() {
                         {skill.name}
                       </TableCell>
                       <TableCell>
-                        {skill.level} ({skill.getDisplayName()})
+                        {skill.level} ({getSkillDisplayName(skill)})
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -327,6 +270,7 @@ export default function CreatureDetailPage() {
             )}
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Ziele</CardTitle>
@@ -357,6 +301,7 @@ export default function CreatureDetailPage() {
             )}
           </CardContent>
         </Card>
+
         <Card className="col-span-2">
           <CardHeader>
             <CardTitle>Attribute</CardTitle>
