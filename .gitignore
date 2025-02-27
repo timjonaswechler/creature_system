@@ -16,7 +16,7 @@
 # next.js
 /.next/
 /out/
-
+/.obsidian/
 # production
 /build
 
@@ -39,4 +39,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.obsidian/*
+
+prototype.ipynb

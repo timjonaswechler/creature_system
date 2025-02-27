@@ -15,6 +15,7 @@ export interface IBody {
 
   // Query methods
   getBodyPartById(id: string): IBodyPart;
+  getBodyPartID(bodyPart: IBodyPart): string;
   getBodyPartByName(name: string): IBodyPart;
   getAllBodyParts(): IBodyPart[];
   getAllbodyPartsByType(type: string): IBodyPart[];

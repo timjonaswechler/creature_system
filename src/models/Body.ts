@@ -74,6 +74,10 @@ export class Body implements IBody {
     return bodyPart;
   }
 
+  getBodyPartID(bodyPart: IBodyPart): string {
+    return bodyPart.id;
+  }
+
   getBodyPartByName(name: string): IBodyPart {
     const bodyPart = this.bodyParts.find((part) => part.name === name);
     if (!bodyPart) {
