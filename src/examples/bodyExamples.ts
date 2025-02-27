@@ -108,7 +108,8 @@ export function createBasicHumanoidBody(): Body {
       detachable: false,
     }
   );
-
+  console.log("body");
+  console.log(body);
   return body;
 }
 

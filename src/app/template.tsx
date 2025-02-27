@@ -1,15 +1,8 @@
 import React from "react";
 import { AppSidebar } from "@/components/blocks/mail/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumb-dynamic";
 import { Separator } from "@/components/ui/separator";
+
 import {
   SidebarInset,
   SidebarProvider,
@@ -31,10 +24,10 @@ export default function Template({
             <Separator orientation="vertical" className="mr-2 h-4" />
             <DynamicBreadcrumb />
           </div>
+          <div className="flex-1" />
+          {/* TODO: Here Theme-Switch */}
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -1,6 +1,7 @@
 // src/utils/creatureManager.ts
 import { v4 as uuidv4 } from "uuid"; // Du musst dieses Paket installieren: npm install uuid @types/uuid
 import { ICreature } from "@/interfaces/ICreature";
+import { createBasicHumanoidBody } from "@/examples/bodyExamples";
 
 export const STORAGE_KEY = "creatures";
 
@@ -43,36 +44,13 @@ export const getCreatureById = (id: string): ICreature | null => {
 export const createNewCreature = (name: string): ICreature => {
   // Hier erstellst du eine neue Kreatur mit allen erforderlichen Eigenschaften
   // und setzt sinnvolle Standardwerte
+  const body = createBasicHumanoidBody();
   const newCreature: ICreature = {
     id: uuidv4(),
     name: name,
     birthdate: new Date(),
     genome: { id: uuidv4(), chromosomes: [] },
-    body: {
-      id: uuidv4(),
-      bodyParts: [],
-      addBodyPart: () => {},
-      removeBodyPart: () => {},
-      updateBodyPart: () => {},
-      getBodyPartById: () => ({
-        id: "",
-        name: "",
-        type: "HEAD",
-        tissueLayer: [],
-        connections: { childConnections: [] },
-      }),
-      getBodyPartByName: () => ({
-        id: "",
-        name: "",
-        type: "HEAD",
-        tissueLayer: [],
-        connections: { childConnections: [] },
-      }),
-      getAllBodyParts: () => [],
-      getAllbodyPartsByType: () => [],
-      getConnectedBodyParts: () => [],
-      traverseBodyParts: () => [],
-    },
+    body: body,
     memory: { events: [] },
     goals: [],
     skills: [],

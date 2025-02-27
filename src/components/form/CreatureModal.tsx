@@ -23,6 +23,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   race: z.string().min(1, "Bitte wähle eine Rasse aus"),
@@ -123,53 +130,26 @@ export function CreatureModal({
             <label htmlFor="race" className="text-sm font-medium">
               Rasse
             </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
-                  className="w-full justify-between"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  {form.watch("race")
-                    ? races.find((race) => race.value === form.watch("race"))
-                        ?.label
-                    : "Rasse auswählen"}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <div className="max-h-[200px] overflow-auto">
-                  {races.map((race) => (
-                    <div
-                      key={race.value}
-                      onClick={() => {
-                        form.setValue("race", race.value, {
-                          shouldValidate: true,
-                        });
-                      }}
-                      className={cn(
-                        "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
-                        race.value === form.watch("race")
-                          ? "bg-accent text-accent-foreground"
-                          : ""
-                      )}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          race.value === form.watch("race")
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                      {race.label}
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+
+            {/* Replace Popover with Select for better dropdown functionality */}
+            <Select
+              onValueChange={(value) =>
+                form.setValue("race", value, { shouldValidate: true })
+              }
+              value={form.watch("race")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Rasse auswählen" />
+              </SelectTrigger>
+              <SelectContent>
+                {races.map((race) => (
+                  <SelectItem key={race.value} value={race.value}>
+                    {race.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <p className="text-sm text-muted-foreground">
               Wähle die Rasse deiner Kreatur.
             </p>
