@@ -3,13 +3,6 @@
 import { useState, useEffect } from "react";
 import { getCreatures } from "@/lib/creatureManager";
 import { ICreature } from "@/interfaces/ICreature";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 import { CreatureModal } from "@/components/form/CreatureModal";

@@ -1,4 +1,4 @@
-// src/app/creature/[id]/page.tsx
+// src/app/creature/[id]/page.tsx (Updated)
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { TraitEditor } from "@/components/form/TraitEditor";
 import { SkillEditor } from "@/components/form/SkillEditor";
+import { GoalSection } from "@/components/creature/GoalSection"; // Import the GoalSection
 import { ISkill, SKILL_LEVEL_NAMES } from "@/interfaces/ISkill";
 
 // Helper function to get skill display name since the method might not be preserved in localStorage
@@ -271,36 +272,8 @@ export default function CreatureDetailPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Ziele</CardTitle>
-            <CardDescription>Aktuelle Ziele der Kreatur</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {creature.goals.length === 0 ? (
-              <p className="text-muted-foreground">Keine Ziele definiert.</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ziel</TableHead>
-                    <TableHead>Priorität</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {creature.goals.map((goal) => (
-                    <TableRow key={goal.id}>
-                      <TableCell>{goal.name}</TableCell>
-                      <TableCell>{goal.priority}</TableCell>
-                      <TableCell>{goal.status}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        {/* Add Goals Section */}
+        <GoalSection creature={creature} onGoalUpdated={refreshCreatureData} />
 
         <Card className="col-span-2">
           <CardHeader>

@@ -113,7 +113,9 @@ export function CreatureModal({
 
       {!children && (
         <DialogTrigger asChild>
-          <Button>Neue Kreatur erstellen</Button>
+          <Button variant="outline" className="mt-4 bg-lime-400">
+            Neue Kreatur erstellen
+          </Button>
         </DialogTrigger>
       )}
 

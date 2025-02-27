@@ -30,9 +30,8 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { ICreature } from "@/interfaces/ICreature";
 import { CreatureModal } from "@/components/form/CreatureModal";
+import { getCreatures } from "@/lib/creatureManager";
 import { useState } from "react";
-import { PlusCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,6 +45,7 @@ export function DataTable<TData, TValue>({
   onCreatureCreated,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
+
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [creatures, setCreatures] = useState<ICreature[]>([]);
   const table = useReactTable({
     data,
     columns,
@@ -82,11 +82,9 @@ export function DataTable<TData, TValue>({
     router.push(`/creature/${id}`);
   };
 
-  const handleCreatureCreated = () => {
-    setIsModalOpen(false);
-    if (onCreatureCreated) {
-      onCreatureCreated();
-    }
+  const loadCreatures = () => {
+    const storedCreatures = getCreatures();
+    setCreatures(Object.values(storedCreatures));
   };
 
   return (
@@ -158,9 +156,7 @@ export function DataTable<TData, TValue>({
                     <p className="text-sm text-muted-foreground mt-1">
                       Click here to create your first creature
                     </p>
-                    <Button variant="outline" className="mt-4">
-                      Create Creature
-                    </Button>
+                    <CreatureModal onCreatureCreated={loadCreatures} />
                   </div>
                 </TableCell>
               </TableRow>
