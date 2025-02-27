@@ -251,14 +251,17 @@ export class Creature implements ICreature {
 
     // Erstelle eine neue Gesundheitsbedingung basierend auf dem Effekt
     // Passe die Eigenschaften an deine IHealthCondition-Definition an
+    // In applyHealthEffect method in Creature.ts
     const healthCondition: IHealthCondition = {
       id: uuidv4(),
       name: effect.name,
-      bodyPart: affectedBodyPart.id as IBodyPart, // Sicherstellen, dass es nicht undefined ist
-      // Entferne die description-Eigenschaft, wenn sie nicht in IHealthCondition existiert
-      // description: effect.description,
-      value: effect.severity,
-      // Füge weitere erforderliche Eigenschaften aus deinem IHealthCondition-Interface hinzu
+      affectedBodyPartID: affectedBodyPart ? affectedBodyPart.id : "",
+      severity: effect.severity,
+      // Add other required properties from IHealthCondition
+      painFactor: effect.painFactor,
+      bleedRate: effect.bleedRate,
+      attributeModifiers: effect.attributeModifiers,
+      permanent: effect.isPermanent || false,
     };
 
     // Füge die Bedingung zur Liste hinzu
