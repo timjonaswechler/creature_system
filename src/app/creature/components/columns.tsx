@@ -1,14 +1,16 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { HeaderBulkActions } from "./header-bulk-actions";
 import { ICreature } from "@/types/creature";
 
-export const columns: ColumnDef<ICreature>[] = [
+export const createColumns = (
+  onBulkActionComplete: () => void
+): ColumnDef<ICreature>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -128,6 +130,12 @@ export const columns: ColumnDef<ICreature>[] = [
   },
   {
     id: "actions",
+    header: ({ table }) => (
+      <HeaderBulkActions
+        table={table}
+        onBulkActionComplete={onBulkActionComplete}
+      />
+    ),
     cell: ({ row }) => <DataTableRowActions row={row} />,
     enableSorting: false,
     enableHiding: false,

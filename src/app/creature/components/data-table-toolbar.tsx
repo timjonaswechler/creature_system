@@ -6,18 +6,15 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./data-table-view-options";
+import { ICreature } from "@/types/creature";
 
-// import { priorities, statuses } from "../data/data" // TODO: ändern zu  Alive Dead und andere eigenschaften, Berufe oder so
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-
-interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
+interface DataTableToolbarProps {
+  table: Table<ICreature>;
 }
 
-export function DataTableToolbar<TData>({
-  table,
-}: DataTableToolbarProps<TData>) {
+export function DataTableToolbar({ table }: DataTableToolbarProps) {
   const isFiltered = table.getState().columnFilters.length > 0;
+  const totalRows = table.getFilteredRowModel().rows.length;
 
   return (
     <div className="flex items-center justify-between">
@@ -30,6 +27,12 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
+
+        {/* Display the total count of entries */}
+        <div className="text-sm text-muted-foreground ml-2">
+          {totalRows} {totalRows === 1 ? "Kreatur" : "Kreaturen"}
+        </div>
+
         {isFiltered && (
           <Button
             variant="ghost"

@@ -1,20 +1,17 @@
 // src/app/creature/page.tsx
 "use client";
 import { useState, useEffect } from "react";
-import { getCreatures, saveCreature } from "@/lib/creatureManager";
+import { getCreatures } from "@/lib/creatureManager";
 import { ICreature } from "@/types/creature";
-import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 import { CreatureModal } from "@/components/forms/creature-modal";
 import { Button } from "@/components/ui/button";
-import { createFamilyUnit } from "@/lib/socialSimulation";
-import { toast } from "sonner"; // Change this import
-import { UserPlus } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { CreatureExamples } from "./components/creature-example";
+import { PlusIcon } from "lucide-react";
 
 export default function CreaturePage() {
   const [creatures, setCreatures] = useState<ICreature[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  // Remove the destructuring of useToast
 
   // Load creatures when component mounts
   useEffect(() => {
@@ -26,58 +23,36 @@ export default function CreaturePage() {
     setCreatures(Object.values(storedCreatures));
   };
 
-  const loadSocialRelations = async () => {
-    setIsLoading(true);
-    try {
-      // Create the family unit
-      const family = createFamilyUnit();
-      // Save each family member to storage
-      saveCreature(family.father);
-      saveCreature(family.mother);
-      saveCreature(family.child);
-      // Reload creatures list to show the new family members
-      loadCreatures();
-      // Show success message using Sonner's toast
-      toast.success("Family Created", {
-        description: "A new family with social relationships has been created",
-      });
-    } catch (error) {
-      console.error("Error creating family:", error);
-      toast.error("Error", {
-        description: "Failed to create family with social relationships",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Creatures</h2>
-          <p className="text-muted-foreground">
-            Manage your creature collection
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button
-            onClick={loadSocialRelations}
-            disabled={isLoading}
-            variant="outline"
-          >
-            <UserPlus className="mr-2 h-4 w-4" />
-            {isLoading ? "Creating Family..." : "Create Family Unit"}
-          </Button>
-          <CreatureModal onCreatureCreated={loadCreatures} />
-        </div>
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Kreaturen</h2>
+        <p className="text-muted-foreground">
+          Verwalte deine Kreaturensammlung
+        </p>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={creatures}
-        onCreatureCreated={loadCreatures}
-      />
+      <div className="flex items-center gap-2">
+        <CreatureModal onCreatureCreated={loadCreatures}>
+          <Button>
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Neue Kreatur erstellen
+          </Button>
+        </CreatureModal>
+
+        <CreatureExamples onCreaturesCreated={loadCreatures} />
+
+        <div className="flex-1"></div>
+
+        <p className="text-sm text-muted-foreground">
+          {creatures.length} {creatures.length === 1 ? "Kreatur" : "Kreaturen"}{" "}
+          in der Sammlung
+        </p>
+      </div>
+
+      <Separator />
+
+      <DataTable data={creatures} onCreatureCreated={loadCreatures} />
     </div>
   );
 }

@@ -29,21 +29,16 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { ICreature } from "@/types/creature";
-import { CreatureModal } from "@/components/forms/creature-modal";
-import { getCreatures } from "@/lib/creatureManager";
-import { useState } from "react";
+import { createColumns } from "./columns";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  onCreatureCreated?: () => void;
-}
-
-export function DataTable<TData, TValue>({
-  columns,
+// Hier definieren wir die DataTable speziell für ICreature
+export function DataTable({
   data,
   onCreatureCreated,
-}: DataTableProps<TData, TValue>) {
+}: {
+  data: ICreature[];
+  onCreatureCreated?: () => void;
+}) {
   const router = useRouter();
 
   const [rowSelection, setRowSelection] = React.useState({});
@@ -53,8 +48,20 @@ export function DataTable<TData, TValue>({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [creatures, setCreatures] = useState<ICreature[]>([]);
+
+  // Callback für Bulk-Aktionen
+  const handleBulkActionComplete = () => {
+    if (onCreatureCreated) {
+      onCreatureCreated();
+    }
+  };
+
+  // Erstelle Spalten mit Callback für Bulk-Aktionen
+  const columns = React.useMemo(
+    () => createColumns(handleBulkActionComplete),
+    [handleBulkActionComplete]
+  );
+
   const table = useReactTable({
     data,
     columns,
@@ -78,18 +85,22 @@ export function DataTable<TData, TValue>({
   });
 
   // Function to handle row click
-  const handleRowClick = (id: string) => {
-    router.push(`/creature/${id}`);
-  };
+  const handleRowClick = (id: string, event: React.MouseEvent) => {
+    // Prevent navigation when clicking on a checkbox or action cell
+    if (
+      (event.target as HTMLElement).closest('[data-column-id="select"]') ||
+      (event.target as HTMLElement).closest('[data-column-id="actions"]')
+    ) {
+      return;
+    }
 
-  const loadCreatures = () => {
-    const storedCreatures = getCreatures();
-    setCreatures(Object.values(storedCreatures));
+    router.push(`/creature/${id}`);
   };
 
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -97,7 +108,11 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      data-column-id={header.id}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -117,25 +132,12 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => {
-                    // Use type assertion to access 'id' property
-                    const creature = row.original as ICreature;
-                    handleRowClick(creature.id);
+                  onClick={(e) => {
+                    handleRowClick(row.original.id, e);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      onClick={(e) => {
-                        // Stop propagation if it's a checkbox or action cell
-                        if (
-                          cell.column.id === "select" ||
-                          cell.column.id === "actions"
-                        ) {
-                          e.stopPropagation();
-                        }
-                      }}
-                    >
+                    <TableCell key={cell.id} data-column-id={cell.column.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -148,11 +150,12 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center cursor-pointer"
-                  onClick={() => setIsModalOpen(true)}
+                  className="h-24 text-center"
                 >
                   <div className="flex flex-col items-center justify-center p-8 text-center hover:bg-muted/30 rounded-md transition-colors">
-                    <p className="text-lg font-medium">No creatures found</p>
+                    <p className="text-lg font-medium">
+                      Keine Kreaturen gefunden
+                    </p>
                   </div>
                 </TableCell>
               </TableRow>
