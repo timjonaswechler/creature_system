@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { Table } from "@tanstack/react-table"
-import { X } from "lucide-react"
+import { Table } from "@tanstack/react-table";
+import { X } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "@/components/blocks/tasks/components/data-table-view-options"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { DataTableViewOptions } from "./data-table-view-options";
 
-// import { priorities, statuses } from "../data/data" // TODO: ändern zu  Alive Dead und andere eigenschaften, Berufe oder so 
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+// import { priorities, statuses } from "../data/data" // TODO: ändern zu  Alive Dead und andere eigenschaften, Berufe oder so
+import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
-  table: Table<TData>
+  table: Table<TData>;
 }
 
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0
+  const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
     <div className="flex items-center justify-between">
@@ -43,5 +43,5 @@ export function DataTableToolbar<TData>({
       </div>
       <DataTableViewOptions table={table} />
     </div>
-  )
+  );
 }

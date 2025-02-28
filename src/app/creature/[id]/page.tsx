@@ -23,17 +23,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TraitEditor } from "@/components/forms/trait-editor";
-import { SkillEditor } from "@/components/forms/skill-editor";
+import { TraitEditor } from "@/components/creature-profile/trait-editor";
+import { SkillEditor } from "@/components/creature-profile/skill-editor";
 import { ISkill, SKILL_LEVEL_NAMES } from "@/types/skill";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { AttributesCard } from "@/components/creatureID/attributes";
-import { GoalsCard } from "@/components/creatureID/goals";
-import { SkillsCard } from "@/components/creatureID/skills";
-import { TraitsCard } from "@/components/creatureID/traits";
-import { SocialRelationsCard } from "@/components/creatureID/social-relations";
+import { AttributesCard } from "@/components/creature-profile/attributes";
+import { GoalsCard } from "@/components/creature-profile/goals";
+import { SkillsCard } from "@/components/creature-profile/skills";
+import { TraitsCard } from "@/components/creature-profile/traits";
+import { SocialRelationsCard } from "@/components/creature-profile/social-relations";
 import {
   Popover,
   PopoverContent,

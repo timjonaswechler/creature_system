@@ -1,6 +1,6 @@
 import React from "react";
 import { ICreature } from "@/types/creature";
-import { TraitEditor } from "@/components/forms/trait-editor";
+import { TraitEditor } from "@/components/creature-profile/trait-editor";
 import {
   Card,
   CardContent,

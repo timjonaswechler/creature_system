@@ -1,6 +1,6 @@
 import React from "react";
 import { ICreature } from "@/types/creature";
-import { ISkill, SKILL_LEVEL_NAMES } from "@/types/ISkill";
+import { ISkill, SKILL_LEVEL_NAMES } from "@/types/skill";
 import {
   Card,
   CardContent,
@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SkillEditor } from "@/components/form/SkillEditor";
+import { SkillEditor } from "@/components/creature-profile/skill-editor";
 
 interface SkillsCardProps {
   creature: ICreature;

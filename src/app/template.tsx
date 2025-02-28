@@ -1,5 +1,5 @@
 import React from "react";
-import { AppSidebar } from "@/components/blocks/mail/app-sidebar";
+import { AppSidebar } from "@/components/app-sidebar/app-sidebar";
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumb-dynamic";
 import { Separator } from "@/components/ui/separator";
 
