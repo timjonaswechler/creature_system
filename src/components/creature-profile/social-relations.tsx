@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ICreature } from "@/types/creature";
 import { SocialRelationType, ISocialRelation } from "@/types/social-relation";
-import { Creature } from "@/lib/models/creature";
+import { getCreatureById } from "@/lib/creatureManager";
 
 interface SocialRelationsCardProps {
   creature: ICreature;
@@ -66,8 +66,31 @@ function getRelationshipBadgeVariant(
 export const SocialRelationsCard: React.FC<SocialRelationsCardProps> = ({
   creature,
 }) => {
+  // Cache for creature names to avoid repeated lookups
+  const [creatureNames, setCreatureNames] = useState<Record<string, string>>(
+    {}
+  );
+
   // Get all relationships and sort them by relation type
   const relationships = creature.socialRelations || [];
+
+  useEffect(() => {
+    // Load all target creature names on component mount
+    const loadCreatureNames = () => {
+      const names: Record<string, string> = {};
+
+      relationships.forEach((relation) => {
+        const targetCreature = getCreatureById(relation.targetId);
+        if (targetCreature) {
+          names[relation.targetId] = targetCreature.name;
+        }
+      });
+
+      setCreatureNames(names);
+    };
+
+    loadCreatureNames();
+  }, [relationships]);
 
   if (relationships.length === 0) {
     return null;
@@ -96,14 +119,7 @@ export const SocialRelationsCard: React.FC<SocialRelationsCardProps> = ({
             {relationships.map((relation) => (
               <TableRow key={relation.targetId}>
                 <TableCell>
-                  {(() => {
-                    const targetCreature = Creature.findById
-                      ? Creature.findById(relation.targetId)
-                      : null;
-                    return targetCreature
-                      ? targetCreature.name
-                      : relation.targetId;
-                  })()}
+                  {creatureNames[relation.targetId] || relation.targetId}
                 </TableCell>
                 <TableCell>
                   <Badge variant={getRelationshipBadgeVariant(relation)}>
