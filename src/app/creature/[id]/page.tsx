@@ -29,6 +29,10 @@ import { ISkill, SKILL_LEVEL_NAMES } from "@/interfaces/ISkill";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { AttributesCard } from "@/app/creature/[id]/components/Attributes";
+import { GoalsCard } from "@/app/creature/[id]/components/Goals";
+import { SkillsCard } from "@/app/creature/[id]/components/Skills";
+import { TraitsCard } from "@/app/creature/[id]/components/Traits";
 import {
   Popover,
   PopoverContent,
@@ -188,17 +192,18 @@ export default function CreatureDetailPage() {
                     Mentaler Zustand
                   </TableCell>
                   <TableCell>
-                    {creature.mentalStates.length > 0
+                    {creature.mentalStates && creature.mentalStates.length > 0
                       ? creature.mentalStates[0].name
                       : "Normal"}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">
-                    Sozialer Zustand
+                    Soziale Beziehungen
                   </TableCell>
                   <TableCell>
-                    {creature.socialRelations.length > 0
+                    {creature.socialRelations &&
+                    creature.socialRelations.length > 0
                       ? `${creature.socialRelations.length} Beziehungen`
                       : "Keine Beziehungen"}
                   </TableCell>
@@ -208,243 +213,13 @@ export default function CreatureDetailPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Eigenschaften</CardTitle>
-              <CardDescription>
-                Persönliche Eigenschaften dieser Kreatur
-              </CardDescription>
-            </div>
-            {creature && (
-              <TraitEditor
-                creature={creature}
-                onTraitAdded={refreshCreatureData}
-              />
-            )}
-          </CardHeader>
-          <CardContent>
-            {creature.traits.length === 0 ? (
-              <p className="text-muted-foreground">
-                Keine Eigenschaften definiert.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {creature.traits.map((trait) => (
-                  <div key={trait.id} className="p-3 border rounded-md">
-                    <div className="flex justify-between items-center">
-                      <div className="font-medium">{trait.name}</div>
-                      <Badge
-                        variant={
-                          trait.impact === "POSITIVE"
-                            ? "default"
-                            : trait.impact === "NEGATIVE"
-                            ? "destructive"
-                            : trait.impact === "NEUTRAL"
-                            ? "secondary"
-                            : "outline"
-                        }
-                      >
-                        {trait.impact}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {trait.description}
-                    </p>
-                    <div className="text-xs text-muted-foreground mt-2">
-                      Kategorie: {trait.category}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <TraitsCard creature={creature} onTraitAdded={refreshCreatureData} />
 
-        {/* Skills Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Fähigkeiten</CardTitle>
-              <CardDescription>
-                Erlernte Fähigkeiten der Kreatur
-              </CardDescription>
-            </div>
-            {creature && (
-              <SkillEditor
-                creature={creature}
-                onSkillAdded={refreshCreatureData}
-              />
-            )}
-          </CardHeader>
-          <CardContent>
-            {creature.skills.length === 0 ? (
-              <p className="text-muted-foreground">
-                Keine Fähigkeiten erlernt.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fähigkeit</TableHead>
-                    <TableHead>Level</TableHead>
-                    <TableHead>Leidenschaft</TableHead>
-                    <TableHead>Kategorie</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {creature.skills.map((skill) => (
-                    <TableRow key={skill.id}>
-                      <TableCell className="font-medium">
-                        {skill.name}
-                      </TableCell>
-                      <TableCell>
-                        {skill.level} ({getSkillDisplayName(skill)})
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            skill.passion === "BURNING"
-                              ? "default"
-                              : skill.passion === "MAJOR"
-                              ? "secondary"
-                              : skill.passion === "MINOR"
-                              ? "outline"
-                              : "secondary"
-                          }
-                        >
-                          {skill.passion}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{skill.category}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <SkillsCard creature={creature} onSkillAdded={refreshCreatureData} />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Ziele</CardTitle>
-            <CardDescription>Aktuelle Ziele der Kreatur</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {creature.goals.length === 0 ? (
-              <p className="text-muted-foreground">Keine Ziele definiert.</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ziel</TableHead>
-                    <TableHead>Priorität</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {creature.goals.map((goal) => (
-                    <TableRow key={goal.id}>
-                      <TableCell>{goal.name}</TableCell>
-                      <TableCell>{goal.priority}</TableCell>
-                      <TableCell>{goal.status}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <GoalsCard creature={creature} />
 
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Attribute</CardTitle>
-            <CardDescription>
-              Physische, mentale und soziale Eigenschaften
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Physische Attribute */}
-              <div>
-                <h3 className="font-semibold mb-2">Physisch</h3>
-                <div className="space-y-2">
-                  {Object.entries(creature.physicalAttributes).map(
-                    ([key, attr]) => (
-                      <div
-                        key={key}
-                        className="flex justify-between items-center"
-                      >
-                        <span>{attr.name}</span>
-                        <div className="flex items-center">
-                          <div className="w-32 bg-secondary rounded-full h-2 mr-2">
-                            <div
-                              className="bg-primary h-2 rounded-full"
-                              style={{ width: `${attr.currentValue}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm">{attr.currentValue}</span>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-
-              {/* Mentale Attribute */}
-              <div>
-                <h3 className="font-semibold mb-2">Mental</h3>
-                <div className="space-y-2">
-                  {Object.entries(creature.mentalAttributes).map(
-                    ([key, attr]) => (
-                      <div
-                        key={key}
-                        className="flex justify-between items-center"
-                      >
-                        <span>{attr.name}</span>
-                        <div className="flex items-center">
-                          <div className="w-32 bg-secondary rounded-full h-2 mr-2">
-                            <div
-                              className="bg-primary h-2 rounded-full"
-                              style={{ width: `${attr.currentValue}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm">{attr.currentValue}</span>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-
-              {/* Soziale Attribute */}
-              <div>
-                <h3 className="font-semibold mb-2">Sozial</h3>
-                <div className="space-y-2">
-                  {Object.entries(creature.socialAttributes).map(
-                    ([key, attr]) => (
-                      <div
-                        key={key}
-                        className="flex justify-between items-center"
-                      >
-                        <span>{attr.name}</span>
-                        <div className="flex items-center">
-                          <div className="w-32 bg-secondary rounded-full h-2 mr-2">
-                            <div
-                              className="bg-primary h-2 rounded-full"
-                              style={{ width: `${attr.currentValue}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm">{attr.currentValue}</span>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <AttributesCard creature={creature} />
       </div>
     </div>
   );
