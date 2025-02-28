@@ -142,7 +142,7 @@ export default function CreatureDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="col-span-2 lg:col-span-1">
           <CardHeader>
             <CardTitle>Allgemeine Informationen</CardTitle>
           </CardHeader>

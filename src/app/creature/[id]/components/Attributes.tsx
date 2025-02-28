@@ -22,7 +22,7 @@ export function AttributesCard({ creature }: AttributesCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lx:grid-cols-3 gap-6">
           {/* Physische Attribute */}
           <div>
             <h3 className="font-semibold mb-2">Physisch</h3>

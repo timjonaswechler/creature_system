@@ -20,7 +20,7 @@ export const TraitsCard: React.FC<TraitsCardProps> = ({
   onTraitAdded,
 }) => {
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Eigenschaften</CardTitle>
@@ -38,6 +38,7 @@ export const TraitsCard: React.FC<TraitsCardProps> = ({
             Keine Eigenschaften definiert.
           </p>
         ) : (
+          //Here we map over the traits of the creature and display them in a list
           <div className="space-y-2">
             {creature.traits.map((trait) => (
               <div key={trait.id} className="p-3 border rounded-md">

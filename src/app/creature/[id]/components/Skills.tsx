@@ -50,7 +50,7 @@ function getSkillDisplayName(skill: ISkill): string {
 
 export function SkillsCard({ creature, onSkillAdded }: SkillsCardProps) {
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Fähigkeiten</CardTitle>
