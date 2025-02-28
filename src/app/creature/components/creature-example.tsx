@@ -12,6 +12,7 @@ import {
   Sparkles,
   Leaf,
   Loader2,
+  Baby,
 } from "lucide-react";
 import { saveCreature } from "@/lib/creatureManager";
 import { createFamilyUnit } from "@/lib/socialSimulation";
@@ -32,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { set } from "date-fns";
 
 interface CreatureExamplesProps {
   onCreaturesCreated: () => void;
@@ -42,6 +44,28 @@ export function CreatureExamples({
 }: CreatureExamplesProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentTask, setCurrentTask] = useState<string | null>(null);
+  // create Humanoid
+  const createBasicHumanoid = async () => {
+    setIsLoading(true);
+    setCurrentTask("Erstelle Humanoid...");
+
+    try {
+      const humanoid = createBasicCreature("Humanoid");
+      saveCreature(humanoid);
+      onCreaturesCreated();
+      toast.success("Humanoid erstellt", {
+        description: "Ein neuer Humanoid wurde erstellt",
+      });
+    } catch (error) {
+      console.error("Error creating humanoid:", error);
+      toast.error("Fehler", {
+        description: "Fehler beim Erstellen des Humanoid",
+      });
+    } finally {
+      setIsLoading(false);
+      setCurrentTask(null);
+    }
+  };
 
   // Create a basic family unit (parent + child)
   const createFamily = async () => {
@@ -826,10 +850,16 @@ export function CreatureExamples({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Humanoid</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={createBasicHumanoid}>
+          <UserPlus className="mr-2 h-4 w-4" />
+          Humanoid erstellen
+        </DropdownMenuItem>
         <DropdownMenuLabel>Gruppenvorlagen</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={createFamily}>
-          <UserPlus className="mr-2 h-4 w-4" />
+          <Baby className="mr-2 h-4 w-4" />
           Familie erstellen
         </DropdownMenuItem>
         <DropdownMenuItem onClick={createWarriorGroup}>
