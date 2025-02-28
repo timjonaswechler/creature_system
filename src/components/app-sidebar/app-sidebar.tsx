@@ -47,8 +47,8 @@ const data = {
           url: "/creature",
         },
         {
-          title: "History",
-          url: "#",
+          title: "Weapons",
+          url: "/weapons",
         },
         {
           title: "Starred",
