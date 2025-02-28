@@ -119,7 +119,7 @@ export const columns: ColumnDef<ICreature>[] = [
       <DataTableColumnHeader column={column} title="State" />
     ),
     cell: ({ row }) => {
-      const mentalStates = row.original.mentalStates;
+      const mentalStates = row.original.mentalStates || [];
       return (
         <div>{mentalStates.length > 0 ? mentalStates[0].name : "Normal"}</div>
       );

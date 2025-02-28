@@ -1,10 +1,13 @@
-// src/interfaces/ICreature.ts (überarbeitet)
+// Updated src/interfaces/ICreature.ts
+// This removes the old social relation definitions and imports the new ones
+
 import { IGenome } from "./IGenome";
 import { IBody } from "./IBody";
 import { IMemory } from "./IMemory";
 import { IGoal } from "./IGoal";
 import { ISkill } from "./ISkill";
 import { ITrait } from "./ITrait";
+import { ISocialRelation } from "./ISocialRelation"; // Import the new interface
 import {
   IPhysicalAttributes,
   IMentalAttributes,
@@ -40,7 +43,7 @@ export interface ICreature {
   // Status und Zustände
   healthConditions: IHealthCondition[]; // Gesundheitszustände, Verletzungen
   mentalStates: IMentalState[]; // Psychische Zustände (z.B. Tantrum)
-  socialRelations: ISocialRelation[]; // Beziehungen zu anderen Kreaturen
+  socialRelations: ISocialRelation[]; // Using the new ISocialRelation interface
 
   // Methoden
   calculateMood(): number;
@@ -52,6 +55,12 @@ export interface ICreature {
   // Unterstützende Berechnungen
   getEffectiveSkillLevel(skillId: string): number;
   getEffectiveAttributeValue(attributeId: string): number;
+
+  // New methods for social relationships
+  getRelationship(targetId: string): ISocialRelation | undefined;
+  getAllRelationships(): ISocialRelation[];
+  processInteraction(targetId: string, quality: number, reason?: string): void;
+  handleDeathNotification(creatureId: string): void;
 }
 
 export interface INeed {
@@ -116,27 +125,12 @@ export interface IBehaviorModifier {
   value: any;
 }
 
-export interface ISocialRelation {
-  targetId: string;
-  type: SocialRelationType;
-  value: number; // -100 bis +100
-  opinionModifiers: IOpinionModifier[];
-}
-
-export enum SocialRelationType {
-  FAMILY = "FAMILY", // Familienmitglied
-  LOVER = "LOVER", // Partner
-  FRIEND = "FRIEND", // Freund
-  RIVAL = "RIVAL", // Rivale
-  ENEMY = "ENEMY", // Feind
-  ACQUAINTANCE = "ACQUAINTANCE", // Bekannter
-}
-
 export interface IOpinionModifier {
   reason: string;
   value: number;
   expiryDate?: Date;
 }
+
 export interface IHealthEffect {
   id: string;
   name: string;

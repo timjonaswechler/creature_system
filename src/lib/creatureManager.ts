@@ -1,10 +1,12 @@
 // src/utils/creatureManager.ts
-import { v4 as uuidv4 } from "uuid"; // Du musst dieses Paket installieren: npm install uuid @types/uuid
+import { v4 as uuidv4 } from "uuid";
 import { createBasicHumanoidBody } from "@/examples/bodyExamples";
 import { Trait } from "../models/Trait";
 import { Skill } from "../models/Skill";
+import { SocialRelation } from "../models/SocialRelation"; // Import SocialRelation class
 import { TraitCategory, TraitImpact } from "../interfaces/ITrait";
 import { SkillCategory, SkillPassion } from "../interfaces/ISkill";
+import { creatureReplacer, deserializeSocialRelation } from "./serialization"; // Import serialization helpers
 
 import {
   ICreature,
@@ -12,7 +14,6 @@ import {
   IThought,
   IHealthCondition,
   IMentalState,
-  ISocialRelation,
   IHealthEffect,
 } from "../interfaces/ICreature";
 import {
@@ -32,14 +33,31 @@ export const saveCreature = (creature: ICreature): void => {
   // Aktuelle Kreaturen laden
   const storedCreatures = getCreatures();
 
-  // Neue Kreatur hinzufügen/aktualisieren
-  const updatedCreatures = {
-    ...storedCreatures,
-    [creature.id]: creature,
+  // Convert the social relations to a serializable format
+  const serializedCreature = {
+    ...creature,
+    // Remove the relationship manager which is recreated at runtime
+    relationshipManager: undefined,
+    // Convert social relations to plain objects
+    socialRelations: creature.socialRelations.map((rel) => {
+      if (rel instanceof SocialRelation) {
+        return rel; // This will be processed by the creatureReplacer
+      }
+      return rel;
+    }),
   };
 
-  // Zurück in localStorage speichern
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCreatures));
+  // Neue Kreatur hinzufügen/aktualisieren with custom replacer function
+  const updatedCreatures = {
+    ...storedCreatures,
+    [creature.id]: serializedCreature,
+  };
+
+  // Zurück in localStorage speichern using custom replacer
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(updatedCreatures, creatureReplacer)
+  );
 };
 
 /**
@@ -47,7 +65,30 @@ export const saveCreature = (creature: ICreature): void => {
  */
 export const getCreatures = (): Record<string, ICreature> => {
   const storedCreatures = localStorage.getItem(STORAGE_KEY);
-  return storedCreatures ? JSON.parse(storedCreatures) : {};
+  if (!storedCreatures) return {};
+
+  // Parse the stored creatures
+  const parsedCreatures = JSON.parse(storedCreatures);
+
+  // Recreate proper SocialRelation objects
+  Object.values(parsedCreatures).forEach((creature: any) => {
+    if (creature.socialRelations && Array.isArray(creature.socialRelations)) {
+      creature.socialRelations = creature.socialRelations.map((rel: any) => {
+        // Recreate the SocialRelation object with proper methods
+        return deserializeSocialRelation(rel);
+      });
+    }
+
+    // Restore Date objects
+    if (creature.birthdate) {
+      creature.birthdate = new Date(creature.birthdate);
+    }
+
+    // Re-instantiate the relationship manager when the creature is accessed
+    // This happens in the Creature constructor, so we don't need to do it here
+  });
+
+  return parsedCreatures;
 };
 
 /**
@@ -55,7 +96,14 @@ export const getCreatures = (): Record<string, ICreature> => {
  */
 export const getCreatureById = (id: string): ICreature | null => {
   const creatures = getCreatures();
-  return creatures[id] || null;
+  const creature = creatures[id] || null;
+
+  // If the creature exists, ensure it has a properly initialized relationship manager
+  if (creature && !("relationshipManager" in creature)) {
+    // This will be recreated when the Creature class is instantiated
+  }
+
+  return creature;
 };
 
 /**

@@ -153,10 +153,6 @@ export function DataTable<TData, TValue>({
                 >
                   <div className="flex flex-col items-center justify-center p-8 text-center hover:bg-muted/30 rounded-md transition-colors">
                     <p className="text-lg font-medium">No creatures found</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Click here to create your first creature
-                    </p>
-                    <CreatureModal onCreatureCreated={loadCreatures} />
                   </div>
                 </TableCell>
               </TableRow>

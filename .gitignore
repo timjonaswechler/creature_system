@@ -40,4 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Prototypes
 prototype.ipynb
+file.html
+markdown_file.md

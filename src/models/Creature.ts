@@ -6,7 +6,6 @@ import {
   IThought,
   IHealthCondition,
   IMentalState,
-  ISocialRelation,
   IHealthEffect,
   MentalStateSeverity,
 } from "../interfaces/ICreature";
@@ -16,6 +15,12 @@ import { IMemory } from "../interfaces/IMemory";
 import { IGoal } from "../interfaces/IGoal";
 import { ISkill } from "../interfaces/ISkill";
 import { ITrait } from "../interfaces/ITrait";
+import { RelationshipManager } from "./RelationshipManager";
+import {
+  ISocialRelation,
+  SocialRelationType,
+} from "../interfaces/ISocialRelation";
+
 import {
   IPhysicalAttributes,
   IMentalAttributes,
@@ -50,6 +55,8 @@ export class Creature implements ICreature {
   mentalStates: IMentalState[] = [];
   socialRelations: ISocialRelation[] = [];
 
+  private relationshipManager: RelationshipManager;
+
   constructor(params: {
     id: string;
     name: string;
@@ -64,6 +71,8 @@ export class Creature implements ICreature {
     this.genome = params.genome;
     this.body = params.body;
     this.memory = params.memory;
+    this.socialRelations = [];
+    this.relationshipManager = new RelationshipManager(this);
 
     (this.mentalStates = [
       {
@@ -76,7 +85,6 @@ export class Creature implements ICreature {
         behaviorModifiers: [],
       },
     ]),
-      (this.socialRelations = []),
       // Initialisiere Attribute
       this.initializeAttributes();
   }
@@ -326,10 +334,6 @@ export class Creature implements ICreature {
     }
   }
 
-  // applyHealthEffect(effect: IHealthEffect): void { // TODO: Implementierung
-  //   // Implementierung von Gesundheitseffekten
-  // }
-
   applyThought(thought: IThought): void {
     // Prüfe, ob der Gedanke bereits existiert
     const existingThought = this.thoughts.find((t) => t.id === thought.id);
@@ -380,5 +384,90 @@ export class Creature implements ICreature {
     ];
 
     return allAttributes.find((attr) => attr.id === attributeId) || null;
+  }
+  /**
+   * Get a relationship with another creature by ID
+   */
+  getRelationship(targetId: string): ISocialRelation | undefined {
+    return this.relationshipManager.getRelationship(targetId);
+  }
+  getAllRelationships(): ISocialRelation[] {
+    return this.relationshipManager.getAllRelationships();
+  }
+  /**
+   * Process an interaction with another creature
+   */
+  processInteraction(targetId: string, quality: number, reason?: string): void {
+    this.relationshipManager.processInteraction(targetId, quality, reason);
+  }
+
+  /**
+   * Handle notification that a creature this one knows has died
+   */
+  handleDeathNotification(creatureId: string): void {
+    this.relationshipManager.processRelatedCreatureDeath(creatureId);
+  }
+
+  /**
+   * Get all friends of this creature
+   */
+  getFriends(): ISocialRelation[] {
+    return this.socialRelations.filter(
+      (rel) =>
+        rel.type === SocialRelationType.FRIEND ||
+        rel.type === SocialRelationType.CLOSE_FRIEND ||
+        rel.type === SocialRelationType.KINDRED_SPIRIT
+    );
+  }
+
+  /**
+   * Get all family members of this creature
+   */
+  getFamilyMembers(): ISocialRelation[] {
+    return this.socialRelations.filter(
+      (rel) =>
+        rel.type === SocialRelationType.SPOUSE ||
+        rel.type === SocialRelationType.LOVER ||
+        rel.type === SocialRelationType.PARENT ||
+        rel.type === SocialRelationType.CHILD ||
+        rel.type === SocialRelationType.SIBLING ||
+        rel.type === SocialRelationType.GRANDPARENT ||
+        rel.type === SocialRelationType.GRANDCHILD ||
+        rel.type === SocialRelationType.AUNT_UNCLE ||
+        rel.type === SocialRelationType.NIECE_NEPHEW ||
+        rel.type === SocialRelationType.COUSIN ||
+        rel.type === SocialRelationType.FAMILY
+    );
+  }
+
+  /**
+   * Get all grudges/enemies of this creature
+   */
+  getEnemies(): ISocialRelation[] {
+    return this.socialRelations.filter(
+      (rel) =>
+        rel.type === SocialRelationType.GRUDGE ||
+        rel.type === SocialRelationType.ENEMY ||
+        rel.type === SocialRelationType.RIVAL
+    );
+  }
+
+  /**
+   * Form a familial relationship with another creature
+   */
+  formFamilialRelationship(
+    targetId: string,
+    relationType: SocialRelationType, // Using enum type directly
+    familyDetails: {
+      isBloodRelated: boolean;
+      generationDifference: number;
+      relationshipDescription?: string;
+    }
+  ): ISocialRelation {
+    return this.relationshipManager.setRelationship({
+      targetId,
+      type: relationType,
+      familyDetails,
+    });
   }
 }

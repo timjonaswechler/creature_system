@@ -1,9 +1,9 @@
-// src/app/creature/[id]/page.tsx (Updated)
+// src/app/creature/[id]/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getCreatureById } from "@/lib/creatureManager";
+import { getCreatureById, saveCreature } from "@/lib/creatureManager";
 import { ICreature } from "@/interfaces/ICreature";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -25,8 +25,15 @@ import {
 } from "@/components/ui/table";
 import { TraitEditor } from "@/components/form/TraitEditor";
 import { SkillEditor } from "@/components/form/SkillEditor";
-import { GoalSection } from "@/components/creature/GoalSection"; // Import the GoalSection
 import { ISkill, SKILL_LEVEL_NAMES } from "@/interfaces/ISkill";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Helper function to get skill display name since the method might not be preserved in localStorage
 function getSkillDisplayName(skill: ISkill): string {
@@ -59,6 +66,18 @@ export default function CreatureDetailPage() {
   const [loading, setLoading] = useState(true);
   // State for updating data
   const [refreshData, setRefreshData] = useState(false);
+  // State for the birthdate
+  const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
+
+  // Function to update the creature's birthdate
+  const updateBirthdate = (date: Date | undefined) => {
+    if (date && creature) {
+      const updatedCreature = { ...creature, birthdate: date };
+      setCreature(updatedCreature);
+      saveCreature(updatedCreature);
+    }
+    setBirthdate(date);
+  };
 
   // Function to refresh creature data
   const refreshCreatureData = () => {
@@ -66,6 +85,9 @@ export default function CreatureDetailPage() {
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
       const foundCreature = getCreatureById(id);
       setCreature(foundCreature);
+      setBirthdate(
+        foundCreature ? new Date(foundCreature.birthdate) : undefined
+      );
       setRefreshData((prev) => !prev);
     }
   };
@@ -75,6 +97,9 @@ export default function CreatureDetailPage() {
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
       const foundCreature = getCreatureById(id);
       setCreature(foundCreature);
+      setBirthdate(
+        foundCreature ? new Date(foundCreature.birthdate) : undefined
+      );
       setLoading(false);
     }
   }, [params.id]);
@@ -127,7 +152,35 @@ export default function CreatureDetailPage() {
                 <TableRow>
                   <TableCell className="font-medium">Geburtsdatum</TableCell>
                   <TableCell>
-                    {new Date(creature.birthdate).toLocaleDateString()}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !birthdate && "text-muted-foreground"
+                          )}
+                        >
+                          {birthdate ? (
+                            format(birthdate, "PPP")
+                          ) : (
+                            <span>Datum auswählen</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={birthdate}
+                          onSelect={updateBirthdate}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -272,8 +325,36 @@ export default function CreatureDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Add Goals Section */}
-        <GoalSection creature={creature} onGoalUpdated={refreshCreatureData} />
+        <Card>
+          <CardHeader>
+            <CardTitle>Ziele</CardTitle>
+            <CardDescription>Aktuelle Ziele der Kreatur</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {creature.goals.length === 0 ? (
+              <p className="text-muted-foreground">Keine Ziele definiert.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ziel</TableHead>
+                    <TableHead>Priorität</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {creature.goals.map((goal) => (
+                    <TableRow key={goal.id}>
+                      <TableCell>{goal.name}</TableCell>
+                      <TableCell>{goal.priority}</TableCell>
+                      <TableCell>{goal.status}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
 
         <Card className="col-span-2">
           <CardHeader>
