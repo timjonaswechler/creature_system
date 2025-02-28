@@ -33,6 +33,7 @@ import { AttributesCard } from "@/app/creature/[id]/components/Attributes";
 import { GoalsCard } from "@/app/creature/[id]/components/Goals";
 import { SkillsCard } from "@/app/creature/[id]/components/Skills";
 import { TraitsCard } from "@/app/creature/[id]/components/Traits";
+import { SocialRelationsCard } from "@/app/creature/[id]/components/SocialRelations";
 import {
   Popover,
   PopoverContent,
@@ -220,6 +221,9 @@ export default function CreatureDetailPage() {
         <GoalsCard creature={creature} />
 
         <AttributesCard creature={creature} />
+
+        {/* Add the SocialRelations component */}
+        <SocialRelationsCard creature={creature} />
       </div>
     </div>
   );
