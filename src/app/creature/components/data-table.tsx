@@ -28,7 +28,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { ICreature } from "@/interfaces/ICreature";
+import { ICreature } from "@/types/creature";
 import { CreatureModal } from "@/components/form/CreatureModal";
 import { getCreatures } from "@/lib/creatureManager";
 import { useState } from "react";

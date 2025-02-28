@@ -1,11 +1,11 @@
 // src/lib/serialization.ts
 // Helper functions for serializing and deserializing complex objects
 
-import { SocialRelation } from "../models/SocialRelation";
+import { SocialRelation } from "@/lib/models/social-relation";
 import {
   SocialRelationType,
   RelationshipVariable,
-} from "../interfaces/ISocialRelation";
+} from "@/types/social-relation";
 
 /**
  * Custom replacer function for JSON.stringify to handle circular references

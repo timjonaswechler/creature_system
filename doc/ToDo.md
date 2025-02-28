@@ -1,9 +1,8 @@
-
-# Skill und Traits #skill #trait #attributes 
+# Skill und Traits #skill #trait #attributes
 
 ## 10. Empfehlungen für die Weiterentwicklung
 
-Basierend auf deinen Interfaces und dem Kontext von Dwarf Fortress und RimWorld, hier einige Empfehlungen für die Weiterentwicklung:
+Basierend auf deinen types und dem Kontext von Dwarf Fortress und RimWorld, hier einige Empfehlungen für die Weiterentwicklung:
 
 1. **Attribut-Vererbung**: Implementiere ein System, bei dem Attribute teilweise vererbt werden können, ähnlich wie in Dwarf Fortress. Das Genom könnte dabei eine Rolle spielen.
 2. **Skill-Verfall-System**: Implementiere ein vollständiges System für den Verfall von Skills über Zeit, ähnlich wie in Dwarf Fortress. #skill

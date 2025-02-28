@@ -2,10 +2,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { getCreatures, saveCreature } from "@/lib/creatureManager";
-import { ICreature } from "@/interfaces/ICreature";
+import { ICreature } from "@/types/creature";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
-import { CreatureModal } from "@/components/form/CreatureModal";
+import { CreatureModal } from "@/components/forms/creature-modal";
 import { Button } from "@/components/ui/button";
 import { createFamilyUnit } from "@/lib/socialSimulation";
 import { toast } from "sonner"; // Change this import

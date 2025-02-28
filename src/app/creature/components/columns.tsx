@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { ICreature } from "@/interfaces/ICreature";
+import { ICreature } from "@/types/creature";
 
 export const columns: ColumnDef<ICreature>[] = [
   {

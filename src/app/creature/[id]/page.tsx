@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getCreatureById, saveCreature } from "@/lib/creatureManager";
-import { ICreature } from "@/interfaces/ICreature";
+import { ICreature } from "@/types/creature";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,17 +23,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TraitEditor } from "@/components/form/TraitEditor";
-import { SkillEditor } from "@/components/form/SkillEditor";
-import { ISkill, SKILL_LEVEL_NAMES } from "@/interfaces/ISkill";
+import { TraitEditor } from "@/components/forms/trait-editor";
+import { SkillEditor } from "@/components/forms/skill-editor";
+import { ISkill, SKILL_LEVEL_NAMES } from "@/types/skill";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { AttributesCard } from "@/app/creature/[id]/components/Attributes";
-import { GoalsCard } from "@/app/creature/[id]/components/Goals";
-import { SkillsCard } from "@/app/creature/[id]/components/Skills";
-import { TraitsCard } from "@/app/creature/[id]/components/Traits";
-import { SocialRelationsCard } from "@/app/creature/[id]/components/SocialRelations";
+import { AttributesCard } from "@/components/creatureID/attributes";
+import { GoalsCard } from "@/components/creatureID/goals";
+import { SkillsCard } from "@/components/creatureID/skills";
+import { TraitsCard } from "@/components/creatureID/traits";
+import { SocialRelationsCard } from "@/components/creatureID/social-relations";
 import {
   Popover,
   PopoverContent,

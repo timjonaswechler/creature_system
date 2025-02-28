@@ -3,11 +3,13 @@
 
 // 1. Setting up initial relationships when creating a creature
 import { v4 as uuidv4 } from "uuid";
-import { Creature } from "@/models/Creature";
-import { SocialRelationType } from "@/interfaces/ISocialRelation";
-import { createBasicHumanoidBody } from "@/examples/bodyExamples";
-import { ICreature } from "@/interfaces/ICreature";
-import { RelationshipVariable } from "@/interfaces/ISocialRelation";
+import { Creature } from "@/lib/models/creature";
+import {
+  SocialRelationType,
+  RelationshipVariable,
+} from "@/types/social-relation";
+import { createBasicHumanoidBody } from "@/data/body-examples";
+import { ICreature } from "@/types/creature";
 
 // Creating a family unit example
 export function createFamilyUnit() {

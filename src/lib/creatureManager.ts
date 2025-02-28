@@ -1,11 +1,11 @@
 // src/utils/creatureManager.ts
 import { v4 as uuidv4 } from "uuid";
-import { createBasicHumanoidBody } from "@/examples/bodyExamples";
-import { Trait } from "../models/Trait";
-import { Skill } from "../models/Skill";
-import { SocialRelation } from "../models/SocialRelation"; // Import SocialRelation class
-import { TraitCategory, TraitImpact } from "../interfaces/ITrait";
-import { SkillCategory, SkillPassion } from "../interfaces/ISkill";
+import { createBasicHumanoidBody } from "@/data/body-examples";
+import { Trait } from "@/lib/models/trait";
+import { Skill } from "@/lib/models/skill";
+import { SocialRelation } from "@/lib/models/social-relation"; // Import SocialRelation class
+import { TraitCategory, TraitImpact } from "@/types/trait";
+import { SkillCategory, SkillPassion } from "@/types/skill";
 import { creatureReplacer, deserializeSocialRelation } from "./serialization"; // Import serialization helpers
 
 import {
@@ -15,15 +15,15 @@ import {
   IHealthCondition,
   IMentalState,
   IHealthEffect,
-} from "../interfaces/ICreature";
+} from "@/types/creature";
 import {
   IPhysicalAttributes,
   IMentalAttributes,
   ISocialAttributes,
   AttributeCategory,
-} from "../interfaces/IAttribute";
-import { Attribute } from "../models/Attribute";
-import { Creature } from "@/models/Creature";
+} from "@/types/attribute";
+import { Attribute } from "@/lib/models/attribute";
+import { Creature } from "@/lib/models/creature";
 export const STORAGE_KEY = "creatures";
 
 /**

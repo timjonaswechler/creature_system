@@ -1,6 +1,6 @@
 import React from "react";
 import { ICreature } from "@/types/creature";
-import { ISkill, SKILL_LEVEL_NAMES } from "@/types/ISkill";
+import { ISkill, SKILL_LEVEL_NAMES } from "@/types/skill";
 import {
   Card,
   CardContent,
@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SkillEditor } from "@/components/form/SkillEditor";
+import { SkillEditor } from "@/components/forms/skill-editor";
 
 interface SkillsCardProps {
   creature: ICreature;
@@ -50,7 +50,7 @@ function getSkillDisplayName(skill: ISkill): string {
 
 export function SkillsCard({ creature, onSkillAdded }: SkillsCardProps) {
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Fähigkeiten</CardTitle>

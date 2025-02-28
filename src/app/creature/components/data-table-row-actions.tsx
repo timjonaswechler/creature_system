@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Row } from "@tanstack/react-table"
-import { MoreHorizontal, Trash2 } from "lucide-react"
+import { Row } from "@tanstack/react-table";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,32 +16,32 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 // import { labels } from "../data/data"
 // import { taskSchema } from "../data/schema"
-import { deleteCreature } from "@/lib/creatureManager"
-import { useRouter } from "next/navigation"
-import { ICreature } from "@/interfaces/ICreature"
+import { deleteCreature } from "@/lib/creatureManager";
+import { useRouter } from "next/navigation";
+import { ICreature } from "@/types/creature";
 
 interface DataTableRowActionsProps<TData> {
-  row: Row<TData>
+  row: Row<TData>;
 }
 
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const router = useRouter()
-    // Direkt auf die Eigenschaften des original-Objekts zugreifen, ohne Validierung
-    const creature = row.original as ICreature
-    
-    const handleDelete = () => {
-      if (confirm("Bist du sicher, dass du diese Kreatur löschen möchtest?")) {
-        deleteCreature(creature.id)
-        // Seite neu laden, um die Änderungen zu sehen
-        window.location.reload()
-      }
+  const router = useRouter();
+  // Direkt auf die Eigenschaften des original-Objekts zugreifen, ohne Validierung
+  const creature = row.original as ICreature;
+
+  const handleDelete = () => {
+    if (confirm("Bist du sicher, dass du diese Kreatur löschen möchtest?")) {
+      deleteCreature(creature.id);
+      // Seite neu laden, um die Änderungen zu sehen
+      window.location.reload();
     }
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -78,5 +78,5 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

@@ -22,7 +22,7 @@ interface GoalsCardProps {
 
 export function GoalsCard({ creature }: GoalsCardProps) {
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader>
         <CardTitle>Ziele</CardTitle>
         <CardDescription>Aktuelle Ziele der Kreatur</CardDescription>
