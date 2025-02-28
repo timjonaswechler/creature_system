@@ -7,6 +7,7 @@ import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { HeaderBulkActions } from "./header-bulk-actions";
 import { ICreature } from "@/types/creature";
+import { TraitImpact } from "@/types/trait";
 
 export const createColumns = (
   onBulkActionComplete: () => void
@@ -40,33 +41,77 @@ export const createColumns = (
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("name")}</div>
-    ),
+    cell: ({ row }) => {
+      // Check if creature is a favorite
+      const isFavorite = row.original.traits?.some(
+        (trait) => trait.name === "Favorit" || trait.name === "Favorite"
+      );
+
+      return (
+        <div className="flex items-center gap-2">
+          <div className="font-medium">{row.getValue("name")}</div>
+          {isFavorite && (
+            <Badge variant="secondary" className="text-amber-500">
+              ★
+            </Badge>
+          )}
+        </div>
+      );
+    },
     enableSorting: true,
     enableHiding: false,
   },
   {
     accessorKey: "birthdate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Birthdate" />
+      <DataTableColumnHeader column={column} title="Alter" />
     ),
     cell: ({ row }) => {
-      const birthdate = row.getValue("birthdate");
+      const birthdate = new Date(row.original.birthdate);
+      const today = new Date();
+      const ageInYears = Math.floor(
+        (today.getTime() - birthdate.getTime()) / (1000 * 60 * 60 * 24 * 365)
+      );
+
       const formattedDate = birthdate
-        ? new Date(birthdate as string).toLocaleDateString()
-        : "Unknown";
-      return <div>{formattedDate}</div>;
+        ? birthdate.toLocaleDateString()
+        : "Unbekannt";
+
+      return (
+        <div className="flex flex-col">
+          <span>{ageInYears} Jahre</span>
+          <span className="text-muted-foreground text-xs">{formattedDate}</span>
+        </div>
+      );
     },
     enableSorting: true,
   },
   {
-    accessorKey: "skills",
+    accessorKey: "socialRelations",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Skills" />
+      <DataTableColumnHeader column={column} title="Beziehungen" />
     ),
     cell: ({ row }) => {
-      const skills = row.original.skills;
+      const relations = row.original.socialRelations || [];
+      return (
+        <div>
+          {relations.length > 0 ? (
+            <Badge>{relations.length} Beziehungen</Badge>
+          ) : (
+            <span className="text-muted-foreground text-sm">Keine</span>
+          )}
+        </div>
+      );
+    },
+    enableSorting: false,
+  },
+  {
+    accessorKey: "skills",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Fähigkeiten" />
+    ),
+    cell: ({ row }) => {
+      const skills = row.original.skills || [];
       return (
         <div className="flex flex-wrap gap-1">
           {skills.length > 0 ? (
@@ -79,7 +124,7 @@ export const createColumns = (
                 </Badge>
               ))
           ) : (
-            <span className="text-muted-foreground">Keine Skills</span>
+            <span className="text-muted-foreground text-sm">Keine</span>
           )}
           {skills.length > 2 && (
             <Badge variant="outline">+{skills.length - 2} mehr</Badge>
@@ -92,23 +137,38 @@ export const createColumns = (
   {
     accessorKey: "traits",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Traits" />
+      <DataTableColumnHeader column={column} title="Eigenschaften" />
     ),
     cell: ({ row }) => {
-      const traits = row.original.traits;
+      const traits = row.original.traits || [];
+      // Filter out the "Favorit" trait for display
+      const displayTraits = traits.filter(
+        (trait) => trait.name !== "Favorit" && trait.name !== "Favorite"
+      );
+
       return (
         <div className="flex flex-wrap gap-1">
-          {traits.length > 0 ? (
-            traits.slice(0, 2).map((trait) => (
-              <Badge key={trait.id} variant="outline" className="mr-1">
+          {displayTraits.length > 0 ? (
+            displayTraits.slice(0, 2).map((trait) => (
+              <Badge
+                key={trait.id}
+                variant={
+                  trait.impact === TraitImpact.POSITIVE
+                    ? "default"
+                    : trait.impact === TraitImpact.NEGATIVE
+                    ? "destructive"
+                    : "outline"
+                }
+                className="mr-1"
+              >
                 {trait.name}
               </Badge>
             ))
           ) : (
-            <span className="text-muted-foreground">No traits</span>
+            <span className="text-muted-foreground text-sm">Keine</span>
           )}
-          {traits.length > 2 && (
-            <Badge variant="outline">+{traits.length - 2} more</Badge>
+          {displayTraits.length > 2 && (
+            <Badge variant="outline">+{displayTraits.length - 2} mehr</Badge>
           )}
         </div>
       );
@@ -118,12 +178,25 @@ export const createColumns = (
   {
     accessorKey: "mentalStates",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="State" />
+      <DataTableColumnHeader column={column} title="Zustand" />
     ),
     cell: ({ row }) => {
       const mentalStates = row.original.mentalStates || [];
+      const currentState =
+        mentalStates.length > 0 ? mentalStates[0].name : "Normal";
+      const isNormal = currentState === "Normal";
+
       return (
-        <div>{mentalStates.length > 0 ? mentalStates[0].name : "Normal"}</div>
+        <div>
+          <Badge
+            variant={isNormal ? "outline" : "secondary"}
+            className={
+              !isNormal ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : ""
+            }
+          >
+            {currentState}
+          </Badge>
+        </div>
       );
     },
     enableSorting: false,
@@ -136,7 +209,9 @@ export const createColumns = (
         onBulkActionComplete={onBulkActionComplete}
       />
     ),
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => (
+      <DataTableRowActions row={row} onActionComplete={onBulkActionComplete} />
+    ),
     enableSorting: false,
     enableHiding: false,
   },

@@ -852,7 +852,7 @@ export function CreatureExamples({
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Humanoid</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={createBasicHumanoid}>
+        <DropdownMenuItem onClick={createFamily}>
           <UserPlus className="mr-2 h-4 w-4" />
           Humanoid erstellen
         </DropdownMenuItem>

@@ -8,11 +8,16 @@ import {
   Copy,
   UserPlus,
   Share2,
+  Heart,
+  Swords,
+  Users,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ICreature } from "@/types/creature";
 import { deleteCreature, saveCreature } from "@/lib/creatureManager";
 import { SocialRelationType } from "@/types/social-relation";
+import { TraitCategory, TraitImpact } from "@/types/trait";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -86,6 +91,8 @@ export function HeaderBulkActions({
     const selectedCreatures = selectedRows.map((row) => row.original);
 
     // Create relationships between all selected creatures
+    let relationshipsCreated = 0;
+
     selectedCreatures.forEach((creature1) => {
       selectedCreatures.forEach((creature2) => {
         // Don't create a relationship with self
@@ -124,6 +131,8 @@ export function HeaderBulkActions({
 
           // Save the updated creature
           saveCreature(creature1);
+
+          relationshipsCreated++;
         }
       });
     });
@@ -136,7 +145,7 @@ export function HeaderBulkActions({
 
     // Show success notification
     toast.success(
-      `Beziehungen vom Typ "${relationType}" zwischen ${selectedCount} Kreaturen erstellt`
+      `${relationshipsCreated} Beziehungen vom Typ "${relationType}" wurden erstellt`
     );
   };
 
@@ -235,7 +244,7 @@ export function HeaderBulkActions({
           disabled={selectedCount === 0}
         >
           <MoreHorizontal className="h-4 w-4" />
-          <span className="sr-only">Bulk actions menu</span>
+          <span className="sr-only">Aktionen Menü</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
@@ -261,7 +270,7 @@ export function HeaderBulkActions({
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <UserPlus className="mr-2 h-4 w-4" />
-            Beziehung erstellen
+            Beziehungen erstellen
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
@@ -292,6 +301,7 @@ export function HeaderBulkActions({
               <DropdownMenuItem
                 onClick={() => createSocialBonds(SocialRelationType.LOVER)}
               >
+                <Heart className="mr-2 h-4 w-4" />
                 Liebhaber
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -313,7 +323,7 @@ export function HeaderBulkActions({
 
         {/* Delete creatures */}
         <DropdownMenuItem
-          className="text-destructive"
+          className="text-destructive focus:text-destructive"
           onClick={handleBulkDelete}
         >
           <Trash2 className="mr-2 h-4 w-4" />

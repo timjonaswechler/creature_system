@@ -31,7 +31,6 @@ import { DataTableToolbar } from "./data-table-toolbar";
 import { ICreature } from "@/types/creature";
 import { createColumns } from "./columns";
 
-// Hier definieren wir die DataTable speziell für ICreature
 export function DataTable({
   data,
   onCreatureCreated,
@@ -49,17 +48,17 @@ export function DataTable({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  // Callback für Bulk-Aktionen
-  const handleBulkActionComplete = () => {
+  // Callback for row actions and bulk actions
+  const handleActionComplete = () => {
     if (onCreatureCreated) {
       onCreatureCreated();
     }
   };
 
-  // Erstelle Spalten mit Callback für Bulk-Aktionen
+  // Create columns with the action handler
   const columns = React.useMemo(
-    () => createColumns(handleBulkActionComplete),
-    [handleBulkActionComplete]
+    () => createColumns(handleActionComplete),
+    [handleActionComplete]
   );
 
   const table = useReactTable({
@@ -155,6 +154,9 @@ export function DataTable({
                   <div className="flex flex-col items-center justify-center p-8 text-center hover:bg-muted/30 rounded-md transition-colors">
                     <p className="text-lg font-medium">
                       Keine Kreaturen gefunden
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Erstelle neue Kreaturen oder importiere welche.
                     </p>
                   </div>
                 </TableCell>
