@@ -6,25 +6,9 @@ import { useParams, useRouter } from "next/navigation";
 import { getCreatureById, saveCreature } from "@/lib/creatureManager";
 import { ICreature } from "@/types/creature";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar as CalendarIcon } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { TraitEditor } from "@/components/creature-profile/trait-editor";
-import { SkillEditor } from "@/components/creature-profile/skill-editor";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ISkill, SKILL_LEVEL_NAMES } from "@/types/skill";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -39,30 +23,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-// Helper function to get skill display name since the method might not be preserved in localStorage
-function getSkillDisplayName(skill: ISkill): string {
-  const baseName = SKILL_LEVEL_NAMES[skill.level] || "Legendary";
-
-  // Check if it's a legendary+ skill
-  if (skill.level > 16) {
-    const plusCount = skill.level - 16;
-    return `${baseName}${"+".repeat(plusCount)}`;
-  }
-
-  // Check for rust if level is greater than 0
-  if (skill.level > 0) {
-    const rustFactor = skill.rustCounter / 2;
-
-    if (skill.level >= 4 && rustFactor >= 3) {
-      return `${baseName} (V.Rusty)`;
-    } else if (rustFactor > 0) {
-      return `${baseName} (Rusty)`;
-    }
-  }
-
-  return baseName;
-}
 
 export default function CreatureDetailPage() {
   const params = useParams();

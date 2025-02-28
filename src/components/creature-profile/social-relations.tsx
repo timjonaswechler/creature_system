@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ICreature } from "@/types/creature";
 import { SocialRelationType, ISocialRelation } from "@/types/social-relation";
+import { Creature } from "@/lib/models/creature";
 
 interface SocialRelationsCardProps {
   creature: ICreature;
@@ -84,7 +85,7 @@ export const SocialRelationsCard: React.FC<SocialRelationsCardProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Ziel ID</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Beziehungstyp</TableHead>
               <TableHead>Wert</TableHead>
               <TableHead>Kompatibilität</TableHead>
@@ -94,7 +95,16 @@ export const SocialRelationsCard: React.FC<SocialRelationsCardProps> = ({
           <TableBody>
             {relationships.map((relation) => (
               <TableRow key={relation.targetId}>
-                <TableCell>{relation.targetId}</TableCell>
+                <TableCell>
+                  {(() => {
+                    const targetCreature = Creature.findById
+                      ? Creature.findById(relation.targetId)
+                      : null;
+                    return targetCreature
+                      ? targetCreature.name
+                      : relation.targetId;
+                  })()}
+                </TableCell>
                 <TableCell>
                   <Badge variant={getRelationshipBadgeVariant(relation)}>
                     {getRelationshipTypeName(relation.type)}

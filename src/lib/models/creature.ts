@@ -92,7 +92,11 @@ export class Creature implements ICreature {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return Math.floor(diffDays / 365); // Vereinfachte Berechnung
   }
-
+  static findById(id: string): ICreature | null {
+    // Implementation to find a creature by ID
+    // This should be replaced with your actual implementation
+    return null;
+  }
   private initializeAttributes(): void {
     // Physische Attribute
     this.physicalAttributes = {
