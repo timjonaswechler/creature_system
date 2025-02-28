@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -11,7 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getCreatureById } from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 
 interface BreadcrumbItem {
   label: string;
@@ -22,20 +21,20 @@ interface BreadcrumbItem {
 // This function will generate breadcrumbs with custom labels when applicable
 function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
   const paths = pathname.split("/").filter(Boolean);
-  
+
   return paths.map((path, index) => {
     const href = "/" + paths.slice(0, index + 1).join("/");
     let label = path
       .split("-")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-    
+
     // Check if this is a creature ID path and replace with creature name if possible
     if (paths[index - 1] === "creature" && path.length > 8) {
       try {
         // Nur auf der Client-Seite versuchen, die Kreatur zu laden
-        if (typeof window !== 'undefined') {
-          const creature = getCreatureById(path);
+        if (typeof window !== "undefined") {
+          const creature = CreatureService.getCreatureById(path);
           if (creature) {
             label = creature.name;
           }
@@ -49,7 +48,7 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
     return {
       label,
       href,
-      isCurrent: index === paths.length - 1
+      isCurrent: index === paths.length - 1,
     };
   });
 }

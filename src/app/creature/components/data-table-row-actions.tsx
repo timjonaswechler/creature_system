@@ -26,11 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  deleteCreature,
-  getCreatureById,
-  saveCreature,
-} from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 import { ICreature } from "@/types/creature";
 import { SocialRelationType } from "@/types/social-relation";
 import { TraitCategory, TraitImpact } from "@/types/trait";
@@ -57,7 +53,7 @@ export function DataTableRowActions<TData>({
   // Handle deleting a creature
   const handleDelete = () => {
     if (confirm("Bist du sicher, dass du diese Kreatur löschen möchtest?")) {
-      deleteCreature(creature.id);
+      CreatureService.deleteCreature(creature.id);
 
       if (onActionComplete) {
         onActionComplete();
@@ -81,7 +77,7 @@ export function DataTableRowActions<TData>({
       newCreature.socialRelations = [];
 
       // Save the new creature
-      saveCreature(newCreature);
+      CreatureService.saveCreature(newCreature);
 
       if (onActionComplete) {
         onActionComplete();
@@ -105,7 +101,7 @@ export function DataTableRowActions<TData>({
         return;
       }
 
-      const targetCreature = getCreatureById(targetId);
+      const targetCreature = CreatureService.getCreatureById(targetId);
       if (!targetCreature) {
         toast.error("Zielkreatur nicht gefunden");
         return;
@@ -159,11 +155,11 @@ export function DataTableRowActions<TData>({
       // Add relations
       const updatedCreature = { ...creature };
       updatedCreature.socialRelations.push(relation);
-      saveCreature(updatedCreature);
+      CreatureService.saveCreature(updatedCreature);
 
       const updatedTargetCreature = { ...targetCreature };
       updatedTargetCreature.socialRelations.push(reverseRelation);
-      saveCreature(updatedTargetCreature);
+      CreatureService.saveCreature(updatedTargetCreature);
 
       if (onActionComplete) {
         onActionComplete();

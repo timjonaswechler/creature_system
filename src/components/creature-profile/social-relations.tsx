@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ICreature } from "@/types/creature";
 import { SocialRelationType, ISocialRelation } from "@/types/social-relation";
-import { getCreatureById } from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 
 interface SocialRelationsCardProps {
   creature: ICreature;
@@ -80,7 +80,9 @@ export const SocialRelationsCard: React.FC<SocialRelationsCardProps> = ({
       const names: Record<string, string> = {};
 
       relationships.forEach((relation) => {
-        const targetCreature = getCreatureById(relation.targetId);
+        const targetCreature = CreatureService.getCreatureById(
+          relation.targetId
+        );
         if (targetCreature) {
           names[relation.targetId] = targetCreature.name;
         }

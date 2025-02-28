@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ICreature } from "@/types/creature";
-import { deleteCreature, saveCreature } from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 import { SocialRelationType } from "@/types/social-relation";
 import { TraitCategory, TraitImpact } from "@/types/trait";
 import { toast } from "sonner";
@@ -60,7 +60,7 @@ export function HeaderBulkActions({
 
       // Delete each creature
       idsToDelete.forEach((id) => {
-        deleteCreature(id);
+        CreatureService.deleteCreature(id);
       });
 
       // Reset row selection
@@ -130,7 +130,7 @@ export function HeaderBulkActions({
           creature1.socialRelations.push(relation);
 
           // Save the updated creature
-          saveCreature(creature1);
+          CreatureService.saveCreature(creature1);
 
           relationshipsCreated++;
         }
@@ -210,7 +210,7 @@ export function HeaderBulkActions({
         newCreature.socialRelations = [];
 
         // Save the new creature
-        saveCreature(newCreature);
+        CreatureService.saveCreature(newCreature);
         successCount++;
       } catch (error) {
         console.error("Error duplicating creature:", error);

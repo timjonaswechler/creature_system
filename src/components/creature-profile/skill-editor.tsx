@@ -25,7 +25,7 @@ import { SkillCategory, SkillPassion } from "@/types/skill";
 import { ICreature } from "@/types/creature";
 import { v4 as uuidv4 } from "uuid";
 import { Skill } from "@/lib/models/skill";
-import { saveCreature } from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 
 interface SkillEditorProps {
   creature: ICreature;
@@ -61,7 +61,7 @@ export function SkillEditor({ creature, onSkillAdded }: SkillEditorProps) {
     creature.skills.push(skill);
 
     // Speichere die aktualisierte Kreatur
-    saveCreature(creature);
+    CreatureService.saveCreature(creature);
 
     // Reset form and close dialog
     setName("");

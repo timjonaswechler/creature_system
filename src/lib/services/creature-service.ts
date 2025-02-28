@@ -1,34 +1,34 @@
 // src/lib/services/creature-service.ts
-import { v4 as uuidv4 } from "uuid";
 import { ICreature } from "@/types/creature";
 import { SocialRelationType } from "@/types/social-relation";
-import { CreatureFactory } from "@/lib/factories/creature-factory";
+import { GoalType } from "@/types/goal";
 import {
   creatureReplacer,
   deserializeSocialRelation,
 } from "@/lib/serialization";
-import { SocialRelation } from "@/lib/models/social-relation";
+import { CreatureBuilder } from "@/lib/builders/creature-builder";
 
 export const STORAGE_KEY = "creatures";
 
 /**
- * Service for managing creature persistence and operations
+ * Service für die Verwaltung von Kreaturen
+ * Verwendet den CreatureBuilder für die Erstellung
  */
 export class CreatureService {
   /**
-   * Save a creature to localStorage
+   * Speichert eine Kreatur im localStorage
    */
   static saveCreature(creature: ICreature): void {
-    // Get current creatures
+    // Aktuelle Kreaturen laden
     const storedCreatures = this.getCreatures();
 
-    // Add/update creature
+    // Neue Kreatur hinzufügen/aktualisieren
     const updatedCreatures = {
       ...storedCreatures,
       [creature.id]: creature,
     };
 
-    // Save back to localStorage with custom replacer
+    // Zurück in localStorage speichern mit custom replacer
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify(updatedCreatures, creatureReplacer)
@@ -36,23 +36,23 @@ export class CreatureService {
   }
 
   /**
-   * Get all creatures from localStorage
+   * Lädt alle Kreaturen aus dem localStorage
    */
   static getCreatures(): Record<string, ICreature> {
     const storedCreatures = localStorage.getItem(STORAGE_KEY);
     if (!storedCreatures) return {};
 
-    // Parse stored creatures
+    // Parse the stored creatures
     const parsedCreatures = JSON.parse(storedCreatures);
 
-    // Process creatures to ensure proper object types
+    // Process stored creatures to ensure proper object types
     this.processStoredCreatures(parsedCreatures);
 
     return parsedCreatures;
   }
 
   /**
-   * Get a creature by ID
+   * Lädt eine einzelne Kreatur anhand ihrer ID
    */
   static getCreatureById(id: string): ICreature | null {
     const creatures = this.getCreatures();
@@ -60,7 +60,7 @@ export class CreatureService {
   }
 
   /**
-   * Delete a creature by ID
+   * Löscht eine Kreatur anhand ihrer ID
    */
   static deleteCreature(id: string): void {
     const creatures = this.getCreatures();
@@ -71,32 +71,58 @@ export class CreatureService {
   }
 
   /**
-   * Delete all creatures
+   * Löscht alle Kreaturen
    */
   static deleteAllCreatures(): void {
     localStorage.removeItem(STORAGE_KEY);
   }
 
   /**
-   * Create a new basic creature
+   * Erstellt eine neue Basis-Kreatur
    */
   static createCreature(name: string): ICreature {
-    const creature = CreatureFactory.createBasicCreature(name);
+    // Nutze den Builder, um eine Standardkreatur zu erstellen
+    const creature = CreatureBuilder.create(name)
+      .withStandardTraitsAndSkills()
+      .build();
+
+    // Speichere die Kreatur
     this.saveCreature(creature);
+
     return creature;
   }
 
   /**
-   * Create a family unit
+   * Erstellt eine Kreatur mit bestimmtem Archetyp
+   */
+  static createCreatureWithArchetype(
+    name: string,
+    archetype: "warrior" | "scholar" | "craftsman" | "mage" | "ranger"
+  ): ICreature {
+    // Nutze den Builder mit dem spezifizierten Archetyp
+    const creature = CreatureBuilder.create(name)
+      .withArchetype(archetype)
+      .withStandardTraitsAndSkills()
+      .build();
+
+    // Speichere die Kreatur
+    this.saveCreature(creature);
+
+    return creature;
+  }
+
+  /**
+   * Erstellt eine Familie mit Eltern und Kind
    */
   static createFamily(): {
     father: ICreature;
     mother: ICreature;
     child: ICreature;
   } {
-    const family = CreatureFactory.createFamilyUnit();
+    // Nutze den Builder, um eine Familie zu erstellen
+    const family = CreatureBuilder.createFamily();
 
-    // Save all family members
+    // Speichere alle Familienmitglieder
     this.saveCreature(family.father);
     this.saveCreature(family.mother);
     this.saveCreature(family.child);
@@ -105,18 +131,19 @@ export class CreatureService {
   }
 
   /**
-   * Create a warrior group
+   * Erstellt eine Kriegergruppe mit einem Anführer und Gefolgsleuten
    */
   static createWarriorGroup(
     leaderLevel: number = 10,
     followerCount: number = 4
   ): { leader: ICreature; followers: ICreature[] } {
-    const group = CreatureFactory.createWarriorGroup(
+    // Nutze den Builder, um eine Kriegergruppe zu erstellen
+    const group = CreatureBuilder.createWarriorGroup(
       leaderLevel,
       followerCount
     );
 
-    // Save all members
+    // Speichere alle Gruppenmitglieder
     this.saveCreature(group.leader);
     group.followers.forEach((follower) => this.saveCreature(follower));
 
@@ -124,12 +151,13 @@ export class CreatureService {
   }
 
   /**
-   * Create a romantic couple
+   * Erstellt ein romantisches Paar
    */
   static createRomanticCouple(): { lover1: ICreature; lover2: ICreature } {
-    const couple = CreatureFactory.createRomanticCouple();
+    // Nutze den Builder, um ein Liebespaar zu erstellen
+    const couple = CreatureBuilder.createRomanticCouple();
 
-    // Save both creatures
+    // Speichere beide Kreaturen
     this.saveCreature(couple.lover1);
     this.saveCreature(couple.lover2);
 
@@ -137,19 +165,24 @@ export class CreatureService {
   }
 
   /**
-   * Create a scholar group with a master and apprentices
+   * Erstellt eine Gruppe von Gelehrten mit einem Meister und Lehrlingen
    */
   static createScholarGroup(
     masterLevel: number = 10,
     apprenticeCount: number = 4
   ): { master: ICreature; apprentices: ICreature[] } {
-    // Create master scholar
-    const master = CreatureFactory.createScholar(
-      "Meister Gelehrter",
-      masterLevel
-    );
+    // Erstelle Meister-Gelehrten
+    const master = CreatureBuilder.create("Meister Gelehrter")
+      .withArchetype("scholar")
+      .withAge(40 + Math.floor(Math.random() * 20))
+      .withStandardTraitsAndSkills()
+      .withGoalType(GoalType.MASTER_A_SKILL)
+      .build();
 
-    // Create apprentices
+    // Setze den Meister-Level
+    master.skills.find((s) => s.name === "Forschung")!.level = masterLevel;
+
+    // Erstelle Lehrlinge
     const apprentices: ICreature[] = [];
     for (let i = 0; i < apprenticeCount; i++) {
       const level = Math.max(
@@ -157,33 +190,35 @@ export class CreatureService {
         masterLevel - 3 - Math.floor(Math.random() * 3)
       );
       const title = i < apprenticeCount / 2 ? "Gelehrter" : "Schüler";
-      const apprentice = CreatureFactory.createScholar(
-        `${title} ${i + 1}`,
-        level
-      );
 
-      // Create relationships
-      this.addSocialRelation(apprentice, master.id, SocialRelationType.MASTER, {
-        isBloodRelated: false,
-        generationDifference: 1,
-      });
+      const apprentice = CreatureBuilder.create(`${title} ${i + 1}`)
+        .withArchetype("scholar")
+        .withAge(20 + Math.floor(Math.random() * 15))
+        .withStandardTraitsAndSkills()
+        .build();
 
-      this.addSocialRelation(
+      // Setze den Lehrling-Level
+      apprentice.skills.find((s) => s.name === "Forschung")!.level = level;
+
+      // Erstelle Beziehungen zwischen Meister und Lehrling
+      this.createMutualRelationship(
+        apprentice,
         master,
-        apprentice.id,
+        SocialRelationType.MASTER,
         SocialRelationType.APPRENTICE,
         {
           isBloodRelated: false,
-          generationDifference: -1,
+          generationDifference: 1,
         }
       );
 
-      // Apprentices know each other
+      // Erstelle Beziehungen zwischen Lehrlingen
       apprentices.forEach((otherApprentice) => {
         if (apprentice.id !== otherApprentice.id) {
-          this.addSocialRelation(
+          this.createMutualRelationship(
             apprentice,
-            otherApprentice.id,
+            otherApprentice,
+            SocialRelationType.COMPANION,
             SocialRelationType.COMPANION,
             {
               isBloodRelated: false,
@@ -196,7 +231,7 @@ export class CreatureService {
       apprentices.push(apprentice);
     }
 
-    // Save all creatures
+    // Speichere alle Kreaturen
     this.saveCreature(master);
     apprentices.forEach((apprentice) => this.saveCreature(apprentice));
 
@@ -204,19 +239,24 @@ export class CreatureService {
   }
 
   /**
-   * Create a craftsmen group with a master and apprentices
+   * Erstellt eine Gruppe von Handwerkern mit einem Meister und Lehrlingen
    */
   static createCraftsmenGroup(
     masterLevel: number = 10,
     apprenticeCount: number = 4
   ): { master: ICreature; apprentices: ICreature[] } {
-    // Create master craftsman
-    const master = CreatureFactory.createCraftsman(
-      "Meister Handwerker",
-      masterLevel
-    );
+    // Erstelle Meister-Handwerker
+    const master = CreatureBuilder.create("Meister Handwerker")
+      .withArchetype("craftsman")
+      .withAge(40 + Math.floor(Math.random() * 20))
+      .withStandardTraitsAndSkills()
+      .withGoalType(GoalType.CRAFT_A_MASTERWORK)
+      .build();
 
-    // Create apprentices
+    // Setze den Meister-Level
+    master.skills.find((s) => s.name === "Handwerk")!.level = masterLevel;
+
+    // Erstelle Lehrlinge
     const apprentices: ICreature[] = [];
     const crafts = ["Schmied", "Tischler", "Steinmetz", "Weber"];
 
@@ -227,33 +267,35 @@ export class CreatureService {
       );
       const title =
         i < apprenticeCount / 2 ? crafts[i % crafts.length] : "Lehrling";
-      const apprentice = CreatureFactory.createCraftsman(
-        `${title} ${i + 1}`,
-        level
-      );
 
-      // Create relationships
-      this.addSocialRelation(apprentice, master.id, SocialRelationType.MASTER, {
-        isBloodRelated: false,
-        generationDifference: 1,
-      });
+      const apprentice = CreatureBuilder.create(`${title} ${i + 1}`)
+        .withArchetype("craftsman")
+        .withAge(20 + Math.floor(Math.random() * 15))
+        .withStandardTraitsAndSkills()
+        .build();
 
-      this.addSocialRelation(
+      // Setze den Lehrling-Level
+      apprentice.skills.find((s) => s.name === "Handwerk")!.level = level;
+
+      // Erstelle Beziehungen zwischen Meister und Lehrling
+      this.createMutualRelationship(
+        apprentice,
         master,
-        apprentice.id,
+        SocialRelationType.MASTER,
         SocialRelationType.APPRENTICE,
         {
           isBloodRelated: false,
-          generationDifference: -1,
+          generationDifference: 1,
         }
       );
 
-      // Apprentices know each other
+      // Erstelle Beziehungen zwischen Lehrlingen
       apprentices.forEach((otherApprentice) => {
         if (apprentice.id !== otherApprentice.id) {
-          this.addSocialRelation(
+          this.createMutualRelationship(
             apprentice,
-            otherApprentice.id,
+            otherApprentice,
+            SocialRelationType.COMPANION,
             SocialRelationType.COMPANION,
             {
               isBloodRelated: false,
@@ -266,7 +308,7 @@ export class CreatureService {
       apprentices.push(apprentice);
     }
 
-    // Save all creatures
+    // Speichere alle Kreaturen
     this.saveCreature(master);
     apprentices.forEach((apprentice) => this.saveCreature(apprentice));
 
@@ -274,50 +316,60 @@ export class CreatureService {
   }
 
   /**
-   * Create magical beings (wizard, apprentice, familiar)
+   * Erstellt magische Wesen (Zauberer, Lehrling, Vertrauter)
    */
   static createMagicalBeings(): {
     wizard: ICreature;
     apprentice: ICreature;
     familiar: ICreature;
   } {
-    // Create the magical beings
-    const wizard = CreatureFactory.createMagicalBeing("Zauberer", 10);
-    const apprentice = CreatureFactory.createMagicalBeing("Lehrling", 5);
-    const familiar = CreatureFactory.createMagicalBeing("Vertrauter", 3);
+    // Erstelle den Zauberer
+    const wizard = CreatureBuilder.create("Zauberer")
+      .withArchetype("mage")
+      .withAge(50 + Math.floor(Math.random() * 100))
+      .withStandardTraitsAndSkills()
+      .withGoalType(GoalType.MAKE_A_GREAT_DISCOVERY)
+      .build();
 
-    // Create relationships
-    this.addSocialRelation(apprentice, wizard.id, SocialRelationType.MASTER, {
-      isBloodRelated: false,
-      generationDifference: 1,
-    });
+    // Erstelle den Lehrling
+    const apprentice = CreatureBuilder.create("Lehrling")
+      .withArchetype("mage")
+      .withAge(20 + Math.floor(Math.random() * 10))
+      .withStandardTraitsAndSkills()
+      .withGoalType(GoalType.MASTER_A_SKILL)
+      .build();
 
-    this.addSocialRelation(
+    // Erstelle den Vertrauten
+    const familiar = CreatureBuilder.create("Vertrauter")
+      .withArchetype("mage")
+      .withAge(5 + Math.floor(Math.random() * 5))
+      .withStandardTraitsAndSkills()
+      .build();
+
+    // Erstelle Beziehungen
+    this.createMutualRelationship(
+      apprentice,
       wizard,
-      apprentice.id,
+      SocialRelationType.MASTER,
       SocialRelationType.APPRENTICE,
       {
         isBloodRelated: false,
-        generationDifference: -1,
+        generationDifference: 1,
       }
     );
 
-    this.addSocialRelation(
+    this.createMutualRelationship(
       familiar,
-      wizard.id,
+      wizard,
       SocialRelationType.BONDED_ANIMAL,
+      SocialRelationType.OWNER,
       {
         isBloodRelated: false,
         generationDifference: 0,
       }
     );
 
-    this.addSocialRelation(wizard, familiar.id, SocialRelationType.OWNER, {
-      isBloodRelated: false,
-      generationDifference: 0,
-    });
-
-    // Save creatures
+    // Speichere alle Kreaturen
     this.saveCreature(wizard);
     this.saveCreature(apprentice);
     this.saveCreature(familiar);
@@ -326,35 +378,41 @@ export class CreatureService {
   }
 
   /**
-   * Create nature beings (druid, ranger, animal companion)
+   * Erstellt Naturwesen (Druide, Waldläufer, Tiergefährte)
    */
   static createNatureBeings(): {
     druid: ICreature;
     ranger: ICreature;
     animalCompanion: ICreature;
   } {
-    // Create nature beings
-    const druid = CreatureFactory.createNatureBeing("Druide", 10);
-    const ranger = CreatureFactory.createNatureBeing("Waldläufer", 8);
-    const animalCompanion = CreatureFactory.createNatureBeing(
-      "Tiergefährte",
-      5
-    );
+    // Erstelle Druide
+    const druid = CreatureBuilder.create("Druide")
+      .withArchetype("mage") // Mage passt am besten für Druiden-Attribute
+      .withAge(40 + Math.floor(Math.random() * 60))
+      .withStandardTraitsAndSkills()
+      .withGoalType(GoalType.BRING_PEACE_TO_THE_WORLD)
+      .build();
 
-    // Create relationships
-    this.addSocialRelation(
+    // Erstelle Waldläufer
+    const ranger = CreatureBuilder.create("Waldläufer")
+      .withArchetype("ranger")
+      .withAge(25 + Math.floor(Math.random() * 15))
+      .withStandardTraitsAndSkills()
+      .withGoalType(GoalType.SEE_THE_GREAT_NATURAL_SITES)
+      .build();
+
+    // Erstelle Tiergefährte
+    const animalCompanion = CreatureBuilder.create("Tiergefährte")
+      .withArchetype("ranger")
+      .withAge(3 + Math.floor(Math.random() * 6))
+      .withStandardTraitsAndSkills()
+      .build();
+
+    // Erstelle Beziehungen
+    this.createMutualRelationship(
       ranger,
-      druid.id,
-      SocialRelationType.KINDRED_SPIRIT,
-      {
-        isBloodRelated: false,
-        generationDifference: 0,
-      }
-    );
-
-    this.addSocialRelation(
       druid,
-      ranger.id,
+      SocialRelationType.KINDRED_SPIRIT,
       SocialRelationType.KINDRED_SPIRIT,
       {
         isBloodRelated: false,
@@ -362,19 +420,10 @@ export class CreatureService {
       }
     );
 
-    this.addSocialRelation(
+    this.createMutualRelationship(
       animalCompanion,
-      ranger.id,
-      SocialRelationType.BONDED_ANIMAL,
-      {
-        isBloodRelated: false,
-        generationDifference: 0,
-      }
-    );
-
-    this.addSocialRelation(
       ranger,
-      animalCompanion.id,
+      SocialRelationType.BONDED_ANIMAL,
       SocialRelationType.ANIMAL_TRAINER,
       {
         isBloodRelated: false,
@@ -382,7 +431,7 @@ export class CreatureService {
       }
     );
 
-    // Save creatures
+    // Speichere alle Kreaturen
     this.saveCreature(druid);
     this.saveCreature(ranger);
     this.saveCreature(animalCompanion);
@@ -391,7 +440,7 @@ export class CreatureService {
   }
 
   /**
-   * Duplicate a creature
+   * Dupliziert eine Kreatur
    */
   static duplicateCreature(
     creatureId: string,
@@ -401,71 +450,94 @@ export class CreatureService {
     if (!creature) return null;
 
     try {
-      // Create a deep copy of the creature
+      // Erstelle eine tiefe Kopie der Kreatur
       const newCreature = JSON.parse(JSON.stringify(creature));
 
-      // Generate a new ID and update name
-      newCreature.id = uuidv4();
+      // Generiere eine neue ID und aktualisiere den Namen
+      newCreature.id = crypto.randomUUID();
       newCreature.name = newName || `${creature.name} (Kopie)`;
 
-      // Reset some properties that shouldn't be copied
+      // Setze Beziehungen zurück, die nicht dupliziert werden sollten
       newCreature.socialRelations = [];
 
-      // Save the new creature
+      // Speichere die neue Kreatur
       this.saveCreature(newCreature);
 
       return newCreature;
     } catch (error) {
-      console.error("Error duplicating creature:", error);
+      console.error("Fehler beim Duplizieren der Kreatur:", error);
       return null;
     }
   }
 
   /**
-   * Helper method to add a social relation to a creature
+   * Hilfsmethode, um gegenseitige Beziehungen zwischen zwei Kreaturen zu erstellen
    */
-  private static addSocialRelation(
-    creature: ICreature,
-    targetId: string,
-    relationType: SocialRelationType,
-    relationData: {
+  private static createMutualRelationship(
+    creature1: ICreature,
+    creature2: ICreature,
+    relationTypeFrom1To2: SocialRelationType,
+    relationTypeFrom2To1: SocialRelationType,
+    details: {
       isBloodRelated: boolean;
       generationDifference: number;
       relationshipDescription?: string;
     }
   ): void {
-    const relation = new SocialRelation({
-      targetId: targetId,
-      type: relationType,
-      familyDetails: {
-        isBloodRelated: relationData.isBloodRelated,
-        generationDifference: relationData.generationDifference,
-        ...(relationData.relationshipDescription && {
-          relationshipDescription: relationData.relationshipDescription,
-        }),
-      },
-    });
+    // Erstelle Beziehung von Kreatur 1 zu Kreatur 2
+    const builder = new CreatureBuilder(creature1.name);
+    builder.withRelationship(
+      creature2.id,
+      relationTypeFrom1To2,
+      50, // Standardwert für Vertrautheit
+      {
+        isBloodRelated: details.isBloodRelated,
+        generationDifference: details.generationDifference,
+        relationshipDescription: details.relationshipDescription,
+      }
+    );
 
-    if (!creature.socialRelations) {
-      creature.socialRelations = [];
+    // Hinzufügen zur Kreatur 1, wenn noch nicht vorhanden
+    if (
+      !creature1.socialRelations.find((rel) => rel.targetId === creature2.id)
+    ) {
+      creature1.socialRelations.push(builder.build().socialRelations[0]);
     }
 
-    creature.socialRelations.push(relation);
+    // Erstelle Beziehung von Kreatur 2 zu Kreatur 1
+    const builder2 = new CreatureBuilder(creature2.name);
+    builder2.withRelationship(
+      creature1.id,
+      relationTypeFrom2To1,
+      50, // Standardwert für Vertrautheit
+      {
+        isBloodRelated: details.isBloodRelated,
+        generationDifference: -details.generationDifference, // Umgekehrte Generationsdifferenz
+        relationshipDescription: details.relationshipDescription,
+      }
+    );
+
+    // Hinzufügen zur Kreatur 2, wenn noch nicht vorhanden
+    if (
+      !creature2.socialRelations.find((rel) => rel.targetId === creature1.id)
+    ) {
+      creature2.socialRelations.push(builder2.build().socialRelations[0]);
+    }
   }
 
   /**
-   * Process stored creatures to ensure proper object types
+   * Verarbeitet gespeicherte Kreaturen, um sicherzustellen, dass die Objekttypen korrekt sind
    */
   private static processStoredCreatures(creatures: Record<string, any>): void {
     Object.values(creatures).forEach((creature: any) => {
-      // Recreate proper SocialRelation objects
+      // Rekonstruiere SocialRelation-Objekte richtig
       if (creature.socialRelations && Array.isArray(creature.socialRelations)) {
         creature.socialRelations = creature.socialRelations.map((rel: any) => {
           return deserializeSocialRelation(rel);
         });
       }
 
-      // Restore Date objects
+      // Stelle Date-Objekte wieder her
       if (creature.birthdate) {
         creature.birthdate = new Date(creature.birthdate);
       }

@@ -3,13 +3,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getCreatureById, saveCreature } from "@/lib/creatureManager";
+// import { getCreatureById, saveCreature } from "@/lib/creatureManager";
 import { ICreature } from "@/types/creature";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar as CalendarIcon } from "lucide-react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { ISkill, SKILL_LEVEL_NAMES } from "@/types/skill";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -23,6 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { CreatureService } from "@/lib/services/creature-service";
 
 export default function CreatureDetailPage() {
   const params = useParams();
@@ -39,7 +39,7 @@ export default function CreatureDetailPage() {
     if (date && creature) {
       const updatedCreature = { ...creature, birthdate: date };
       setCreature(updatedCreature);
-      saveCreature(updatedCreature);
+      CreatureService.saveCreature(updatedCreature);
     }
     setBirthdate(date);
   };
@@ -48,7 +48,7 @@ export default function CreatureDetailPage() {
   const refreshCreatureData = () => {
     if (params.id) {
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
-      const foundCreature = getCreatureById(id);
+      const foundCreature = CreatureService.getCreatureById(id);
       setCreature(foundCreature);
       setBirthdate(
         foundCreature ? new Date(foundCreature.birthdate) : undefined
@@ -60,7 +60,7 @@ export default function CreatureDetailPage() {
   useEffect(() => {
     if (params.id) {
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
-      const foundCreature = getCreatureById(id);
+      const foundCreature = CreatureService.getCreatureById(id);
       setCreature(foundCreature);
       setBirthdate(
         foundCreature ? new Date(foundCreature.birthdate) : undefined

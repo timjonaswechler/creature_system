@@ -1,7 +1,7 @@
 // src/app/creature/page.tsx
 "use client";
 import { useState, useEffect } from "react";
-import { getCreatures } from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 import { ICreature } from "@/types/creature";
 import { DataTable } from "./components/data-table";
 import { CreatureModal } from "@/components/forms/creature-modal";
@@ -19,7 +19,7 @@ export default function CreaturePage() {
   }, []);
 
   const loadCreatures = () => {
-    const storedCreatures = getCreatures();
+    const storedCreatures = CreatureService.getCreatures();
     setCreatures(Object.values(storedCreatures));
   };
 

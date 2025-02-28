@@ -14,9 +14,9 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-
+import { CreatureService } from "@/lib/services/creature-service";
 import { Input } from "@/components/ui/input";
-import { createNewCreature, saveCreature } from "@/lib/creatureManager";
+// import { createNewCreature, saveCreature } from "@/lib/creatureManager";
 import {
   Select,
   SelectContent,
@@ -83,10 +83,10 @@ export function CreatureModal({
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Kreatur erstellen und speichern
-      const newCreature = createNewCreature(values.name);
+      const newCreature = CreatureService.createCreature(values.name);
       // In einer realen Anwendung würde man hier zusätzlich die Rasse speichern
       // z.B. newCreature.race = values.race;
-      saveCreature(newCreature);
+      CreatureService.saveCreature(newCreature);
 
       // Modal schließen und zurücksetzen
       handleOpenChange(false);

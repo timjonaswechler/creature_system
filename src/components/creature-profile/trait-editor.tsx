@@ -25,7 +25,7 @@ import { TraitCategory, TraitImpact } from "@/types/trait";
 import { ICreature } from "@/types/creature";
 import { v4 as uuidv4 } from "uuid";
 import { Trait } from "@/lib/models/trait";
-import { saveCreature } from "@/lib/creatureManager";
+import { CreatureService } from "@/lib/services/creature-service";
 
 interface TraitEditorProps {
   creature: ICreature;
@@ -56,7 +56,7 @@ export function TraitEditor({ creature, onTraitAdded }: TraitEditorProps) {
     creature.traits.push(trait);
 
     // Speichere die aktualisierte Kreatur
-    saveCreature(creature);
+    CreatureService.saveCreature(creature);
 
     // Reset form and close dialog
     setName("");
