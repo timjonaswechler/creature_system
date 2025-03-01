@@ -27,11 +27,7 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-
-        {/* Display the total count of entries */}
-        <div className="text-sm text-muted-foreground ml-2">
-          {totalRows} {totalRows === 1 ? "Kreatur" : "Kreaturen"}
-        </div>
+        {/* TODO: Nach Fähigkeiten Eiegnschaften Ziele filtern  */}
 
         {isFiltered && (
           <Button

@@ -13,16 +13,6 @@ export default function WeaponsPage() {
         <p className="text-muted-foreground">Verwalte den Waffenkatalog</p>
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="flex-1"></div>
-        <p className="text-sm text-muted-foreground">
-          <Sword className="inline mr-1 h-4 w-4" />
-          Waffen aus dem Verzeichnis
-        </p>
-      </div>
-
-      <Separator />
-
       <WeaponsList />
     </div>
   );

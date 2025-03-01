@@ -19,8 +19,11 @@ import {
   DollarSign,
   Heart,
   Tag,
+  Ruler,
+  Target,
+  BarChart2,
 } from "lucide-react";
-import { IWeapon, WeaponType } from "@/types/weapon";
+import { IWeapon, WeaponType, WeaponCategory } from "@/types/weapon";
 import { WeaponService } from "@/lib/services/weapon-service";
 
 export const WeaponDetail = () => {
@@ -74,6 +77,76 @@ export const WeaponDetail = () => {
     );
   }
 
+  // Formatierung der Reichweite für die Anzeige
+  const getFormattedRange = (): string => {
+    if (!weapon.range || weapon.range.size === 0) return "Keine Angabe";
+
+    if (weapon.range.size === 1) {
+      const value = Array.from(weapon.range.values())[0];
+      return `${value}m`;
+    }
+
+    const rangeEntries = Array.from(weapon.range.entries());
+    return rangeEntries
+      .map(([key, value]) =>
+        key === 0
+          ? `Präzisionsreichweite: ${value}m`
+          : `Maximale Reichweite: ${value}m`
+      )
+      .join(", ");
+  };
+
+  // Formatierung des Schadens für die Anzeige
+  const getFormattedDamage = (): string => {
+    if (!weapon.baseDamage || weapon.baseDamage.length === 0)
+      return "Keine Angabe";
+
+    if (weapon.baseDamage.length === 1) {
+      return `${weapon.baseDamage[0]}`;
+    }
+
+    return `${weapon.baseDamage[0]}-${weapon.baseDamage[1]}`;
+  };
+
+  // Formatierung des Gewichts für die Anzeige
+  const getFormattedWeight = (): string => {
+    if (!weapon.weight || weapon.weight.length === 0) return "Keine Angabe";
+
+    if (weapon.weight.length === 1) {
+      return `${weapon.weight[0]} kg`;
+    }
+
+    return `${weapon.weight[0]}-${weapon.weight[1]} kg`;
+  };
+
+  // Formatierung des Typs für die Anzeige
+  const getWeaponTypeDisplay = (): string => {
+    switch (weapon.type) {
+      case WeaponType.MELEE:
+        return "Nahkampfwaffe";
+      case WeaponType.RANGED:
+        return "Fernkampfwaffe";
+      case WeaponType.THROWING:
+        return "Wurfwaffe";
+      default:
+        return weapon.type;
+    }
+  };
+
+  // Badge-Farbe basierend auf dem Waffentyp
+  const getTypeBadgeColor = (): string => {
+    switch (weapon.type) {
+      case WeaponType.MELEE:
+        return "bg-red-600";
+      case WeaponType.RANGED:
+        return "bg-sky-600";
+      case WeaponType.THROWING:
+        return "bg-emerald-600";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <div className="mb-6">
@@ -89,18 +162,20 @@ export const WeaponDetail = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Hauptinfo-Karte */}
         <Card className="col-span-1 md:col-span-2">
-          <CardHeader>
-            <div className="flex justify-between items-center">
+          <CardHeader className="pb-2">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
               <div>
                 <CardTitle className="text-2xl">{weapon.name}</CardTitle>
-                <CardDescription>
-                  {weapon.type === WeaponType.MELEE
-                    ? "Nahkampfwaffe"
-                    : weapon.type === WeaponType.RANGED
-                    ? "Fernkampfwaffe"
-                    : "Wurfwaffe"}
+                <CardDescription className="flex items-center mt-1">
+                  <Badge className={getTypeBadgeColor()}>
+                    {getWeaponTypeDisplay()}
+                  </Badge>
+                  <span className="ml-2">{weapon.category}</span>
                 </CardDescription>
               </div>
+              <Badge variant="outline" className="text-base px-3 py-1">
+                {weapon.material}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -109,17 +184,17 @@ export const WeaponDetail = () => {
 
               <Separator />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <Sword className="mr-2 h-5 w-5 text-muted-foreground" />
+                  <BarChart2 className="mr-2 h-5 w-5 text-muted-foreground" />
                   <span className="font-medium">Schaden:</span>
-                  <span className="ml-2">{weapon.baseDamage}</span>
+                  <span className="ml-2">{getFormattedDamage()}</span>
                 </div>
 
                 <div className="flex items-center">
                   <Weight className="mr-2 h-5 w-5 text-muted-foreground" />
                   <span className="font-medium">Gewicht:</span>
-                  <span className="ml-2">{weapon.weight} kg</span>
+                  <span className="ml-2">{getFormattedWeight()}</span>
                 </div>
 
                 <div className="flex items-center">
@@ -140,59 +215,80 @@ export const WeaponDetail = () => {
                   <span className="ml-2">{weapon.durability}/100</span>
                 </div>
 
-                {weapon.range && (
+                {weapon.range && weapon.range.size > 0 && (
                   <div className="flex items-center">
-                    <Tag className="mr-2 h-5 w-5 text-muted-foreground" />
+                    <Target className="mr-2 h-5 w-5 text-muted-foreground" />
                     <span className="font-medium">Reichweite:</span>
-                    <span className="ml-2">{weapon.range} m</span>
+                    <span className="ml-2">{getFormattedRange()}</span>
                   </div>
                 )}
               </div>
 
               <Separator />
 
-              <div>
-                <h3 className="font-medium mb-2">Eigenschaften:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {weapon.properties.map((property, index) => (
-                    <Badge key={index} variant="outline">
-                      {property}
-                    </Badge>
-                  ))}
+              {/* Waffen-Eigenschaften */}
+              {weapon.properties && weapon.properties.length > 0 && (
+                <div>
+                  <h3 className="font-medium mb-2">Eigenschaften:</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {weapon.properties.map((property, index) => (
+                      <Badge key={index} variant="outline">
+                        {property}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              )}
 
-        {/* Bild und weitere Infos */}
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Vorschau</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            {weapon.imageUrl ? (
-              <img
-                src={weapon.imageUrl}
-                alt={weapon.name}
-                className="max-w-full max-h-64 object-contain mb-4"
-              />
-            ) : (
-              <div className="w-full h-64 bg-muted flex items-center justify-center mb-4">
-                <Sword className="h-16 w-16 text-muted-foreground" />
-              </div>
-            )}
+              {/* Waffenspezifische Informationen basierend auf dem Typ */}
+              {weapon.type === WeaponType.MELEE && (
+                <div>
+                  <h3 className="font-medium mb-2">Nahkampf-Details:</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Diese Nahkampfwaffe kann in direktem Kontakt mit Gegnern
+                    eingesetzt werden. Sie ist besonders effektiv gegen{" "}
+                    {weapon.category === WeaponCategory.AXES ||
+                    weapon.category === WeaponCategory.SWORDS
+                      ? "ungepanzerte Gegner"
+                      : weapon.category === WeaponCategory.HAMMERS ||
+                        weapon.category === WeaponCategory.MACES
+                      ? "gepanzerte Gegner"
+                      : "verschiedene Gegnertypen"}
+                    .
+                  </p>
+                </div>
+              )}
 
-            <div className="w-full mt-4 space-y-2">
-              <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                <div
-                  className="bg-primary h-full"
-                  style={{ width: `${weapon.durability}%` }}
-                ></div>
-              </div>
-              <p className="text-sm text-center text-muted-foreground">
-                Zustand: {weapon.durability}/100
-              </p>
+              {weapon.type === WeaponType.RANGED && (
+                <div>
+                  <h3 className="font-medium mb-2">Fernkampf-Details:</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Diese Fernkampfwaffe erlaubt Angriffe aus sicherer Distanz.
+                    {weapon.category === WeaponCategory.BOWS
+                      ? " Bögen erfordern Pfeile als Munition und eine ruhige Hand für präzise Schüsse."
+                      : weapon.category === WeaponCategory.CROSSBOWS
+                      ? " Armbrüste bieten hohe Präzision und Durchschlagskraft, benötigen aber Zeit zum Nachladen."
+                      : weapon.category === WeaponCategory.FIREARMS
+                      ? " Feuerwaffen verursachen großen Schaden mit einer explosiven Ladung, sind aber langsam nachzuladen."
+                      : " Diese Fernkampfwaffe hat einzigartige Eigenschaften."}
+                  </p>
+                </div>
+              )}
+
+              {weapon.type === WeaponType.THROWING && (
+                <div>
+                  <h3 className="font-medium mb-2">Wurfwaffen-Details:</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Diese Wurfwaffe kann auf Distanz eingesetzt werden und
+                    verursacht
+                    {weapon.category === WeaponCategory.THROWING_WEAPONS
+                      ? " mittleren bis hohen Schaden. Nach dem Wurf muss die Waffe eingesammelt oder ersetzt werden."
+                      : weapon.category === WeaponCategory.THROWABLE_ITEMS
+                      ? " spezielle Effekte oder Flächenschaden. Diese Gegenstände sind in der Regel Verbrauchsmaterial."
+                      : " verschiedene Arten von Schaden je nach Ziel und Wurfstil."}
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
