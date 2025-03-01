@@ -16,6 +16,8 @@ import {
 } from "./attribute";
 
 export interface ICreature {
+  //TODO: INVENTAR ( WEAPONS; MONEY and CO )
+  //TODO: ARMOR AND CO
   id: string;
   name: string;
   birthdate: Date;

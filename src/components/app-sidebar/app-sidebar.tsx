@@ -13,6 +13,7 @@ import {
   Settings2,
   SquareTerminal,
   BrainCircuit,
+  Sword,
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -47,7 +48,7 @@ const data = {
           url: "/creature",
         },
         {
-          title: "Weapons",
+          title: "Waffen",
           url: "/weapons",
         },
         {

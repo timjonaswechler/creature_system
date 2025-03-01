@@ -14,3 +14,7 @@ Basierend auf deinen types und dem Kontext von Dwarf Fortress und RimWorld, hier
 8. **Lernkurven**: Implementiere unterschiedliche Lernkurven für verschiedene Skills, sodass manche schneller zu erlernen sind als andere. #skill
 9. **Skill-Synergien**: Erlaube, dass Skills sich gegenseitig beeinflussen, sodass Erfahrung in einem verwandten Skill den Lernprozess beschleunigen kann. #skill
 10. **Wertesystem**: Entwickle ein System für moralische und ethische Werte, die Entscheidungen und Reaktionen der Kreaturen beeinflussen.
+
+
+# Waffen 
+  TODO: RANGE und DEFENSE als MELEE waffen attacken nutzen
