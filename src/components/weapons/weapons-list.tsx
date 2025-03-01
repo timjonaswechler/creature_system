@@ -27,7 +27,7 @@ import {
   CirclePlus,
   X,
 } from "lucide-react";
-import { IWeapon, WeaponType, WeaponCategory } from "@/types/weapon";
+import { IWeapon, WeaponType, WeaponCategory, GraspType } from "@/types/weapon";
 import { WeaponService } from "@/lib/services/weapon-service";
 
 export const WeaponsList = () => {
@@ -35,9 +35,16 @@ export const WeaponsList = () => {
   const [filteredWeapons, setFilteredWeapons] = useState<IWeapon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<WeaponType[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<
+    WeaponCategory[]
+  >([]);
   const [selectedGrasp, setSelectedGrasp] = useState<string[]>([]);
+
+  // For dynamic filtering of categories based on selected types
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  // For dynamic filtering of grasp options based on selected types/categories
+  const [availableGrasps, setAvailableGrasps] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("Versuche Waffen zu laden...");
@@ -48,6 +55,16 @@ export const WeaponsList = () => {
         setWeapons(data);
         setFilteredWeapons(data);
         setLoading(false);
+
+        // Initialize available categories and grasps
+        const allCategories = [
+          ...new Set(data.map((weapon) => weapon.category)),
+        ];
+        setAvailableCategories(allCategories);
+
+        // Map all grasp types from the data
+        const allGrasps = [...new Set(data.flatMap((weapon) => weapon.grasp))];
+        setAvailableGrasps(allGrasps);
       })
       .catch((error) => {
         console.error("Error loading weapons:", error);
@@ -56,7 +73,44 @@ export const WeaponsList = () => {
   }, []);
 
   useEffect(() => {
-    // Filtern der Waffen basierend auf Suchbegriff und Filtern
+    // Update available categories based on selected types
+    if (selectedTypes.length > 0) {
+      const filteredByType = weapons.filter((weapon) =>
+        selectedTypes.includes(weapon.type)
+      );
+      const categoriesForType = [
+        ...new Set(filteredByType.map((weapon) => weapon.category)),
+      ];
+      setAvailableCategories(categoriesForType);
+    } else {
+      // If no types selected, show all categories
+      const allCategories = [
+        ...new Set(weapons.map((weapon) => weapon.category)),
+      ];
+      setAvailableCategories(allCategories);
+    }
+
+    // Update available grasps based on selected types and categories
+    let filteredForGrasps = [...weapons];
+
+    if (selectedTypes.length > 0) {
+      filteredForGrasps = filteredForGrasps.filter((weapon) =>
+        selectedTypes.includes(weapon.type)
+      );
+    }
+
+    if (selectedCategories.length > 0) {
+      filteredForGrasps = filteredForGrasps.filter((weapon) =>
+        selectedCategories.includes(weapon.category)
+      );
+    }
+
+    const graspsForSelection = [
+      ...new Set(filteredForGrasps.flatMap((weapon) => weapon.grasp)),
+    ];
+    setAvailableGrasps(graspsForSelection);
+
+    // Main filtering logic for the weapon list
     let result = weapons;
 
     if (searchQuery) {
@@ -79,7 +133,7 @@ export const WeaponsList = () => {
 
     if (selectedGrasp.length > 0) {
       result = result.filter((weapon) =>
-        weapon.grasp.some((g) => selectedGrasp.includes(g))
+        selectedGrasp.every((g) => weapon.grasp.includes(g as GraspType))
       );
     }
 
@@ -90,7 +144,7 @@ export const WeaponsList = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleTypeFilter = (type: string) => {
+  const handleTypeFilter = (type: WeaponType) => {
     setSelectedTypes((current) => {
       if (current.includes(type)) {
         return current.filter((t) => t !== type);
@@ -98,9 +152,30 @@ export const WeaponsList = () => {
         return [...current, type];
       }
     });
+
+    // Reset category filter if it's not available for the selected type
+    setSelectedCategories((prev) => {
+      const newTypes = selectedTypes.includes(type)
+        ? selectedTypes.filter((t) => t !== type)
+        : [...selectedTypes, type];
+
+      if (newTypes.length === 0) return prev; // Keep categories if no types selected
+
+      // Filter weapons by the new type selection
+      const filteredByNewTypes = weapons.filter((weapon) =>
+        newTypes.includes(weapon.type)
+      );
+      // Get available categories for the filtered weapons
+      const categoriesForNewTypes = [
+        ...new Set(filteredByNewTypes.map((weapon) => weapon.category)),
+      ];
+
+      // Keep only categories that are available for the selected types
+      return prev.filter((cat) => categoriesForNewTypes.includes(cat));
+    });
   };
 
-  const handleCategoryFilter = (category: string) => {
+  const handleCategoryFilter = (category: WeaponCategory) => {
     setSelectedCategories((current) => {
       if (current.includes(category)) {
         return current.filter((c) => c !== category);
@@ -108,16 +183,57 @@ export const WeaponsList = () => {
         return [...current, category];
       }
     });
+
+    // Reset type filter if it's not available for the selected category
+    setSelectedTypes((prev) => {
+      const newCategories = selectedCategories.includes(category)
+        ? selectedCategories.filter((c) => c !== category)
+        : [...selectedCategories, category];
+
+      if (newCategories.length === 0) return prev; // Keep types if no categories selected
+
+      // Filter weapons by the new category selection
+      const filteredByNewCategories = weapons.filter((weapon) =>
+        newCategories.includes(weapon.category)
+      );
+      // Get available types for the filtered weapons
+      const typesForNewCategories = [
+        ...new Set(filteredByNewCategories.map((weapon) => weapon.type)),
+      ];
+
+      // Keep only types that are available for the selected categories
+      return prev.filter((type) => typesForNewCategories.includes(type));
+    });
   };
 
   const handleGraspFilter = (grasp: string) => {
+    // Convert UI grasp label to enum value
+    const graspValue =
+      grasp === "Einhändig"
+        ? GraspType.ONE_HANDED
+        : grasp === "Zweihändig"
+        ? GraspType.TWO_HANDED
+        : grasp; // Keep as is for other values like "Vielseitig"
+
     setSelectedGrasp((current) => {
-      if (current.includes(grasp)) {
-        return current.filter((g) => g !== grasp);
+      if (current.includes(graspValue)) {
+        return current.filter((g) => g !== graspValue);
       } else {
-        return [...current, grasp];
+        return [...current, graspValue];
       }
     });
+  };
+
+  // Helper function to display grasp in German
+  const displayGrasp = (grasp: string): string => {
+    switch (grasp) {
+      case GraspType.ONE_HANDED:
+        return "Einhändig";
+      case GraspType.TWO_HANDED:
+        return "Zweihändig";
+      default:
+        return grasp;
+    }
   };
 
   const resetFilters = () => {
@@ -128,7 +244,6 @@ export const WeaponsList = () => {
   };
 
   const getDisplayableRange = (range?: Map<number, number>): string => {
-    console.log("Range:", range);
     if (!range || range.size === 0) return "N/A";
 
     // Falls nur ein Wert vorhanden ist
@@ -288,14 +403,15 @@ export const WeaponsList = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {Object.values(WeaponCategory).map((category) => (
+            {/* Only show categories that are available based on the selected type */}
+            {availableCategories.map((category) => (
               <DropdownMenuItem
                 key={category}
-                onClick={() => handleCategoryFilter(category)}
+                onClick={() => handleCategoryFilter(category as WeaponCategory)}
               >
                 <div
                   className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary ${
-                    selectedCategories.includes(category)
+                    selectedCategories.includes(category as WeaponCategory)
                       ? "bg-primary text-primary-foreground"
                       : "opacity-50 [&_svg]:invisible"
                   }`}
@@ -331,13 +447,13 @@ export const WeaponsList = () => {
                         {selectedGrasp.length} ausgewählt
                       </Badge>
                     ) : (
-                      selectedGrasp.map((category) => (
+                      selectedGrasp.map((grasp) => (
                         <Badge
                           variant="secondary"
-                          key={category}
+                          key={grasp}
                           className="rounded-sm px-1 font-normal"
                         >
-                          {category}
+                          {displayGrasp(grasp)}
                         </Badge>
                       ))
                     )}
@@ -347,10 +463,11 @@ export const WeaponsList = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {["Einhändig", "Zweihändig", "Vielseitig"].map((grasp) => (
+            {/* Map availableGrasps to UI labels */}
+            {availableGrasps.map((grasp) => (
               <DropdownMenuItem
                 key={grasp}
-                onClick={() => handleGraspFilter(grasp)}
+                onClick={() => handleGraspFilter(displayGrasp(grasp))}
               >
                 <div
                   className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary ${
@@ -361,7 +478,7 @@ export const WeaponsList = () => {
                 >
                   <X className="h-3 w-3" />
                 </div>
-                {grasp}
+                {displayGrasp(grasp)}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

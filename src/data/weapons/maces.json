@@ -9,8 +9,9 @@
     "price": 35,
     "material": "Holz",
     "durability": 32,
-    "properties": ["leicht"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "claw_club",
@@ -23,8 +24,9 @@
     "price": 100,
     "material": "Stahl",
     "durability": 76,
-    "properties": ["krallig"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "bludgeon",
@@ -37,8 +39,9 @@
     "price": 90,
     "material": "Stahl",
     "durability": 64,
-    "properties": ["schwer"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "nomad_mace",
@@ -51,8 +54,9 @@
     "price": 100,
     "material": "Stahl",
     "durability": 64,
-    "properties": ["nomadisch"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "light_southern_mace",
@@ -65,8 +69,9 @@
     "price": 400,
     "material": "Stahl",
     "durability": 72,
-    "properties": ["südlich"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "morning_star",
@@ -79,8 +84,9 @@
     "price": 650,
     "material": "Stahl",
     "durability": 72,
-    "properties": ["morgenstern"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "heavy_southern_mace",
@@ -93,8 +99,9 @@
     "price": 2000,
     "material": "Stahl",
     "durability": 80,
-    "properties": ["südlich"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "winged_mace",
@@ -107,8 +114,9 @@
     "price": 2000,
     "material": "Stahl",
     "durability": 80,
-    "properties": ["geflügelt"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "gnarly_staff",
@@ -121,8 +129,9 @@
     "price": 1000,
     "material": "Holz",
     "durability": 56,
-    "properties": ["knorrig"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "tree_limb",
@@ -135,8 +144,9 @@
     "price": 150,
     "material": "Holz",
     "durability": 44,
-    "properties": ["baumig"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "cudgel",
@@ -149,8 +159,9 @@
     "price": 300,
     "material": "Holz",
     "durability": 68,
-    "properties": ["knüpp"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
 },
 {
     "id": "lute",
@@ -163,7 +174,78 @@
     "price": 120,
     "material": "Holz",
     "durability": 2,
-    "properties": ["musikalisch"],
-    "imageUrl": ""
+    "properties": [],
+    "imageUrl": "",
+    "grasp": ["ONE_HANDED"]
+},
+{"id": "spiked_mace",
+"name": "Spiked Mace",
+"description": "",
+"type": "MELEE",
+"category": "MACE",
+"baseDamage": [40,60],
+"weight": [1,2],
+"price": 500,
+"material": "Stahl",
+"durability": 80,
+"properties": [],
+"imageUrl": "",
+"grasp": ["TWO_HANDED"]
+},
+{"id": "two_handed_mace",
+"name": "Two-Handed Mace",
+"description": "",
+"type": "MELEE",
+"category": "MACE",
+"baseDamage": [50,75], 
+"weight": [2,3],
+"price": 1100,
+"material": "Stahl",
+"durability": 80,
+"properties": [],
+"imageUrl": "",
+"grasp": ["TWO_HANDED"]
+},
+{"id": "two_handed_flanged_mace",
+"name": "Two-Handed Flanged Mace",
+"description": "",
+"type": "MELEE",
+"category": "MACE",
+"baseDamage": [75,95],
+"weight": [2,3],
+"price": 1900,
+"material": "Stahl",
+"durability": 120,
+"properties": [],
+"imageUrl": "",
+"grasp": ["TWO_HANDED"]
+},
+{"id": "polemace",
+"name": "Polemace",
+"description": "",
+"type": "MELEE",
+"category": "MACE",
+"baseDamage": [60,75],
+"weight": [1,2],
+"price": 1400,
+"material": "Stahl",
+"durability": 64,
+"properties": [],
+"imageUrl": "",
+"grasp": ["ONE_HANDED"]
+},
+{"id": "goedendag",
+"name": "Goedendag",
+"description": "",
+"type": "MELEE",
+"category": "MACE",
+"baseDamage": [45,75],
+"weight": [1,2],
+"price": 600,
+"material": "Stahl",
+"durability": 64,
+"properties": [],
+"imageUrl": "",
+"grasp": ["ONE_HANDED"]
 }
 ]
