@@ -4,9 +4,13 @@ export enum WeaponType {
   RANGED = "RANGED",
   THROWING = "THROWING",
 }
+export enum GraspType {
+  ONE_HANDED = "ONE_HANDED",
+  TWO_HANDED = "TWO_HANDED",
+}
 export enum WeaponCategory {
   //MELLEE
-  DAGGERS = "DAGGERS",
+  DAGGERS = "DAGGER",
   SWORDS = "SWORDS",
   MACES = "MACES",
   SPEARS = "SPEARS",
@@ -36,6 +40,7 @@ export interface IWeapon {
   material: string; // TODO: Connect with MATERIAL INTERFACE
   durability: number;
   range?: Map<number, number>; // für Fernwaffen
+  grasp: GraspType[];
   properties: string[]; // besondere Eigenschaften wie "zweihändig", "finesse", etc.
   imageUrl?: string;
 }

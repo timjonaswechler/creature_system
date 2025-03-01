@@ -1,6 +1,9 @@
 // src/lib/services/weapon-service.ts
-import weaponsData from "@/data/weapons.json";
-import { IWeapon, WeaponType, WeaponCategory } from "@/types/weapon";
+import daggerData from "@/data/weapons/dagger.json";
+import swordData from "@/data/weapons/sword.json";
+import two_handed_swordData from "@/data/weapons/two_handed_sword.json";
+import { IWeapon, WeaponType, WeaponCategory, GraspType } from "@/types/weapon";
+import { da } from "date-fns/locale";
 
 // Hilfsfunktion zum Konvertieren der Range-Maps
 function parseRange(
@@ -37,10 +40,13 @@ function parseWeapons(data: any[]): IWeapon[] {
     properties: Array.isArray(item.properties) ? item.properties : [],
     imageUrl: item.imageUrl,
     range: parseRange(item.range), // Konvertiere range-Daten in eine Map
+    grasp: Array.isArray(item.grasp) ? item.grasp : [],
   }));
 }
 // Konvertieren der Waffen bereits beim Import
-const typedWeapons: IWeapon[] = parseWeapons(weaponsData);
+const typedWeapons: IWeapon[] = parseWeapons(
+  [daggerData, swordData, two_handed_swordData].flat()
+);
 
 export class WeaponService {
   // Alle Waffen abrufen
@@ -64,6 +70,10 @@ export class WeaponService {
   // Waffen nach Kategorie filtern
   static getWeaponsByCategory(category: WeaponCategory): Promise<IWeapon[]> {
     const weapons = typedWeapons.filter((w) => w.category === category);
+    return Promise.resolve(weapons);
+  }
+  static getWeaponsByGrasp(grasp: GraspType): Promise<IWeapon[]> {
+    const weapons = typedWeapons.filter((w) => w.grasp.includes(grasp));
     return Promise.resolve(weapons);
   }
 

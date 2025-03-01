@@ -37,6 +37,7 @@ export const WeaponsList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedGrasp, setSelectedGrasp] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("Versuche Waffen zu laden...");
@@ -76,8 +77,14 @@ export const WeaponsList = () => {
       );
     }
 
+    if (selectedGrasp.length > 0) {
+      result = result.filter((weapon) =>
+        weapon.grasp.some((g) => selectedGrasp.includes(g))
+      );
+    }
+
     setFilteredWeapons(result);
-  }, [searchQuery, selectedTypes, selectedCategories, weapons]);
+  }, [searchQuery, selectedTypes, selectedCategories, selectedGrasp, weapons]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -103,9 +110,20 @@ export const WeaponsList = () => {
     });
   };
 
+  const handleGraspFilter = (grasp: string) => {
+    setSelectedGrasp((current) => {
+      if (current.includes(grasp)) {
+        return current.filter((g) => g !== grasp);
+      } else {
+        return [...current, grasp];
+      }
+    });
+  };
+
   const resetFilters = () => {
     setSelectedTypes([]);
     setSelectedCategories([]);
+    setSelectedGrasp([]);
     setSearchQuery("");
   };
 
@@ -290,8 +308,67 @@ export const WeaponsList = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 border-dashed">
+              <CirclePlus className="mr-2 h-4 w-4" />
+              Griff
+              {selectedGrasp.length > 0 && (
+                <>
+                  <Separator orientation="vertical" className="mx-2 h-4" />
+                  <Badge
+                    variant="secondary"
+                    className="rounded-sm px-1 font-normal lg:hidden"
+                  >
+                    {selectedGrasp.length}
+                  </Badge>
+                  <div className="hidden space-x-1 lg:flex">
+                    {selectedGrasp.length > 2 ? (
+                      <Badge
+                        variant="secondary"
+                        className="rounded-sm px-1 font-normal"
+                      >
+                        {selectedGrasp.length} ausgewählt
+                      </Badge>
+                    ) : (
+                      selectedGrasp.map((category) => (
+                        <Badge
+                          variant="secondary"
+                          key={category}
+                          className="rounded-sm px-1 font-normal"
+                        >
+                          {category}
+                        </Badge>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {["Einhändig", "Zweihändig", "Vielseitig"].map((grasp) => (
+              <DropdownMenuItem
+                key={grasp}
+                onClick={() => handleGraspFilter(grasp)}
+              >
+                <div
+                  className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary ${
+                    selectedGrasp.includes(grasp)
+                      ? "bg-primary text-primary-foreground"
+                      : "opacity-50 [&_svg]:invisible"
+                  }`}
+                >
+                  <X className="h-3 w-3" />
+                </div>
+                {grasp}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {(selectedTypes.length > 0 ||
-          selectedCategories.length > 0 ||
+          selectedGrasp.length > 0 ||
           searchQuery) && (
           <Button
             variant="ghost"
@@ -348,7 +425,42 @@ export const WeaponsList = () => {
                 </TableCell>
 
                 {/* Waffen Kategorie */}
-                <TableCell>{weapon.category}</TableCell>
+                <TableCell>
+                  <Badge
+                    className={
+                      //MELLEE
+                      weapon.category === WeaponCategory.DAGGERS
+                        ? "bg-red-600"
+                        : weapon.category === WeaponCategory.SWORDS
+                        ? "bg-orange-600"
+                        : weapon.category === WeaponCategory.MACES
+                        ? "bg-amber-600"
+                        : weapon.category === WeaponCategory.SPEARS
+                        ? "bg-yellow-600"
+                        : weapon.category === WeaponCategory.AXES
+                        ? "bg-lime-600"
+                        : weapon.category === WeaponCategory.FLAILS
+                        ? "bg-green-600"
+                        : weapon.category === WeaponCategory.CLEAVERS
+                        ? "bg-emerald-600"
+                        : weapon.category === WeaponCategory.HAMMERS
+                        ? "bg-teal-600"
+                        : weapon.category === WeaponCategory.POLEARMS
+                        ? "bg-cyan-600"
+                        : weapon.category === WeaponCategory.BOWS
+                        ? "bg-sky-600"
+                        : weapon.category === WeaponCategory.CROSSBOWS
+                        ? "bg-blue-600"
+                        : weapon.category === WeaponCategory.FIREARMS
+                        ? "bg-violet-600"
+                        : weapon.category === WeaponCategory.THROWING_WEAPONS
+                        ? "bg-purple-600"
+                        : "bg-fuchsia-600"
+                    }
+                  >
+                    {weapon.category}
+                  </Badge>
+                </TableCell>
 
                 {/* Waffen Schaden */}
                 <TableCell>

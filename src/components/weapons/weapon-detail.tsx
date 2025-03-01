@@ -25,10 +25,20 @@ import {
 } from "lucide-react";
 import { IWeapon, WeaponType, WeaponCategory } from "@/types/weapon";
 import { WeaponService } from "@/lib/services/weapon-service";
+import dynamic from "next/dynamic";
+
+// Importiere die RangeChart-Komponente dynamisch
+const RangeChart = dynamic(() => import("@/components/weapons/range-chart"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-48 flex items-center justify-center bg-muted rounded-md">
+      Lade Reichweitenchart...
+    </div>
+  ),
+});
 
 export const WeaponDetail = () => {
   const params = useParams();
-
   const router = useRouter();
   const [weapon, setWeapon] = useState<IWeapon | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,13 +97,8 @@ export const WeaponDetail = () => {
     }
 
     const rangeEntries = Array.from(weapon.range.entries());
-    return rangeEntries
-      .map(([key, value]) =>
-        key === 0
-          ? `Präzisionsreichweite: ${value}m`
-          : `Maximale Reichweite: ${value}m`
-      )
-      .join(", ");
+    const value = rangeEntries[rangeEntries.length - 1][1];
+    return String(value);
   };
 
   // Formatierung des Schadens für die Anzeige
@@ -218,11 +223,21 @@ export const WeaponDetail = () => {
                 {weapon.range && weapon.range.size > 0 && (
                   <div className="flex items-center">
                     <Target className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <span className="font-medium">Reichweite:</span>
+                    <span className="font-medium">max. Reichweite:</span>
                     <span className="ml-2">{getFormattedRange()}</span>
                   </div>
                 )}
               </div>
+
+              {/* Reichweiten-Chart (nur wenn Werte vorhanden sind) */}
+              {weapon.range && weapon.range.size > 0 && (
+                <div className="mt-4">
+                  <h3 className="font-medium mb-2">Reichweitenprofil:</h3>
+                  <div className="border rounded-md p-4 bg-card">
+                    <RangeChart range={weapon.range} />
+                  </div>
+                </div>
+              )}
 
               <Separator />
 
@@ -289,6 +304,93 @@ export const WeaponDetail = () => {
                   </p>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Bild und weitere Infos */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Vorschau</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center">
+            {weapon.imageUrl ? (
+              <img
+                src={weapon.imageUrl}
+                alt={weapon.name}
+                className="max-w-full max-h-64 object-contain mb-4"
+              />
+            ) : (
+              <div className="w-full h-64 bg-muted flex items-center justify-center mb-4">
+                {weapon.type === WeaponType.MELEE ? (
+                  <Sword className="h-16 w-16 text-muted-foreground" />
+                ) : weapon.type === WeaponType.RANGED ? (
+                  <Target className="h-16 w-16 text-muted-foreground" />
+                ) : (
+                  <Tag className="h-16 w-16 text-muted-foreground" />
+                )}
+              </div>
+            )}
+
+            <div className="w-full mt-4 space-y-2">
+              <h3 className="font-medium mb-2 text-center">Zustand</h3>
+              <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${
+                    weapon.durability > 75
+                      ? "bg-green-500"
+                      : weapon.durability > 50
+                      ? "bg-yellow-500"
+                      : weapon.durability > 25
+                      ? "bg-orange-500"
+                      : "bg-red-500"
+                  }`}
+                  style={{ width: `${weapon.durability}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-center text-muted-foreground">
+                {weapon.durability}/100
+                {weapon.durability > 90
+                  ? " (Ausgezeichnet)"
+                  : weapon.durability > 75
+                  ? " (Gut)"
+                  : weapon.durability > 50
+                  ? " (Gebraucht)"
+                  : weapon.durability > 25
+                  ? " (Abgenutzt)"
+                  : " (Stark beschädigt)"}
+              </p>
+            </div>
+
+            {/* Einsatzgebiete */}
+            <div className="w-full mt-8">
+              <h3 className="font-medium mb-2">Einsatzgebiete</h3>
+              <div className="space-y-2">
+                <Badge
+                  className="w-full justify-center py-1"
+                  variant={
+                    weapon.type === WeaponType.MELEE ? "default" : "outline"
+                  }
+                >
+                  Nahkampf
+                </Badge>
+                <Badge
+                  className="w-full justify-center py-1"
+                  variant={
+                    weapon.type === WeaponType.RANGED ? "default" : "outline"
+                  }
+                >
+                  Fernkampf
+                </Badge>
+                <Badge
+                  className="w-full justify-center py-1"
+                  variant={
+                    weapon.type === WeaponType.THROWING ? "default" : "outline"
+                  }
+                >
+                  Distanzangriff
+                </Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
