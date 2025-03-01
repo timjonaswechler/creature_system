@@ -347,20 +347,6 @@ export const WeaponsList = () => {
               </div>
               Fernkampfwaffen
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => handleTypeFilter(WeaponType.THROWING)}
-            >
-              <div
-                className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary ${
-                  selectedTypes.includes(WeaponType.THROWING)
-                    ? "bg-primary text-primary-foreground"
-                    : "opacity-50 [&_svg]:invisible"
-                }`}
-              >
-                <X className="h-3 w-3" />
-              </div>
-              Wurfwaffen
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -485,6 +471,7 @@ export const WeaponsList = () => {
         </DropdownMenu>
 
         {(selectedTypes.length > 0 ||
+          selectedCategories.length > 0 ||
           selectedGrasp.length > 0 ||
           searchQuery) && (
           <Button

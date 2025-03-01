@@ -4,6 +4,14 @@ import swordsData from "@/data/weapons/swords.json";
 import macesData from "@/data/weapons/maces.json";
 import spearsData from "@/data/weapons/spears.json";
 import axesData from "@/data/weapons/axes.json";
+import cleaversData from "@/data/weapons/cleavers.json";
+import flailsData from "@/data/weapons/flails.json";
+import hammersData from "@/data/weapons/hammers.json";
+import polearmsData from "@/data/weapons/polearms.json";
+import bowsData from "@/data/weapons/bows.json";
+import crossbowsData from "@/data/weapons/crossbows.json";
+import firearmsData from "@/data/weapons/firearms.json";
+import thrownData from "@/data/weapons/throwing_weapons.json";
 import { IWeapon, WeaponType, WeaponCategory, GraspType } from "@/types/weapon";
 
 // Hilfsfunktion zum Konvertieren der Range-Maps
@@ -48,7 +56,21 @@ function parseWeapons(data: any[]): IWeapon[] {
 }
 // Konvertieren der Waffen bereits beim Import
 const typedWeapons: IWeapon[] = parseWeapons(
-  [daggersData, swordsData, spearsData, axesData, macesData].flat()
+  [
+    daggersData,
+    swordsData,
+    spearsData,
+    axesData,
+    macesData,
+    cleaversData,
+    flailsData,
+    hammersData,
+    polearmsData,
+    bowsData,
+    crossbowsData,
+    firearmsData,
+    thrownData,
+  ].flat()
 );
 
 export class WeaponService {

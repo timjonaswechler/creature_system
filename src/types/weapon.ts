@@ -2,7 +2,6 @@
 export enum WeaponType {
   MELEE = "MELEE",
   RANGED = "RANGED",
-  THROWING = "THROWING",
 }
 export enum GraspType {
   ONE_HANDED = "ONE_HANDED",
